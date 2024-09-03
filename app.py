@@ -24,7 +24,7 @@ def index():
 def webhook(): 
     if request.method == "POST": 
         BASE_DIR = os.path.dirname(__file__)
-        repo = git.Repo("깃허브 레포 주소")
+        repo = git.Repo(BASE_DIR)
         origin = repo.remotes.origin
         origin.pull()
         return "Pythonanywhere 서버에 성공적으로 업로드되었습니다.", 200
