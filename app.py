@@ -4,7 +4,7 @@ from layout import streaming
 from dash import html, dcc, Input, Output, State, ctx, MATCH, ALL
 from dash import callback_context
 from flask_sqlalchemy import SQLAlchemy
-from os import path
+import os 
 import git
 
 
@@ -20,9 +20,10 @@ dash_app1 = dash.Dash(__name__, server=app, url_base_pathname='/dashapp1/')
 def index(): 
     return render_template('index.html')
 
-@app.route("/update_server", method=['POST'])
+@app.route("/update_server", methods=['POST'])
 def webhook(): 
     if request.method == "POST": 
+        BASE_DIR = os.path.dirname(__file__)
         repo = git.Repo("깃허브 레포 주소")
         origin = repo.remotes.origin
         origin.pull()
