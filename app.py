@@ -1,10 +1,11 @@
-from flask import Flask, render_template  
+from flask import Flask, render_template, request, jsonify  
 import dash
 from layout import streaming 
 from dash import html, dcc, Input, Output, State, ctx, MATCH, ALL
 from dash import callback_context
 from flask_sqlalchemy import SQLAlchemy
 from os import path
+import git
 
 
 
@@ -18,6 +19,16 @@ dash_app1 = dash.Dash(__name__, server=app, url_base_pathname='/dashapp1/')
 @app.route("/") 
 def index(): 
     return render_template('index.html')
+
+@app.route("/update_server", method=['POST'])
+def webhook(): 
+    if request.method == "POST": 
+        repo = git.Repo("깃허브 레포 주소")
+        origin = repo.remotes.origin
+        origin.pull()
+        return "Pythonanywhere 서버에 성공적으로 업로드되었습니다.", 200
+    else: 
+        return "유효하지 않은 이벤트 타입입니다.", 400
 
 # 애플리케이션 레이아웃 정의
 dash_app1.layout = streaming.streaming_pred() 
