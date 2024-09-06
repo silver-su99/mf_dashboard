@@ -3,18 +3,32 @@ html, body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;  /* 요소의 크기 계산 방식 설정 */
+    scroll-behavior: smooth;
+
 }
+
 
 
 /* ===== 상단바 컴포넌트 ===== */
 /* 상단바 스타일 */
 .navbar {
-    background-color: #202020;  /* 상단바 배경색 */
-    padding: 24px 32px;         /* 상단바 패딩 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;  /* 너비를 100%로 설정하여 전체 화면 너비를 차지하도록 */
+    z-index: 1000;  /* 다른 요소들 위에 표시되도록 z-index 설정 */
+    background-color: #292929;  /* 상단바 배경색 */
+    padding: 40px 40px;         /* 상단바 패딩 */
     overflow: hidden;           /* float 요소가 상단바를 벗어나지 않도록 설정 */
     display: flex;  
     align-items: center;
     justify-content: space-between;
+}
+
+.navbar.shrink {
+    height: 50px; /* 줄어든 크기 */
+    padding: 20px 40px;         /* 상단바 패딩 */
+    color: #949494;
 }
 
 /* 왼쪽 제목 스타일 */
@@ -23,7 +37,40 @@ html, body {
     font-size: 45px;
     font-weight: bold;
     color: white;
+    text-decoration: none; /* 밑줄 제거 */
 }
+
+/* 왼쪽 제목 스타일 */
+.navbar-title.shrink {
+    float: left;
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+.navbar-dashboard-title{
+    margin-right: 100px;
+}
+
+.link-class {
+    color: rgb(255, 255, 255); /* 링크 텍스트 색상 */
+    text-decoration: none; /* 밑줄 제거 */
+    margin-left: 30px; /* 간격 추가 */
+    font-size: 18px;
+}
+
+.link-class.shrink {
+    color: rgb(255, 255, 255); /* 링크 텍스트 색상 */
+    text-decoration: none; /* 밑줄 제거 */
+    margin-left: 30px; /* 간격 추가 */
+    font-size: 15px;
+}
+
+.link-class:hover, .navbar-title:hover {
+    color: rgb(219, 219, 219); /* 마우스 올렸을 때 색상 */
+}
+  
 
 /* 오른쪽 대시보드 제목 스타일 */
 .navbar-dashboard-title {
@@ -43,22 +90,34 @@ html, body {
     justify-content: flex-end;    /* 오른쪽 정렬 */
     padding-top: 10px;               /* 버튼 주위에 여백 추가 */
     padding-right: 60px;
-    margin-top: 10px;
+    margin-top: 150px;
     cursor: pointer;
 }
 
 /* 버튼 스타일 */
 .button-1 {
-    margin-right: 10px;    
+    margin-right: 10px;
     cursor: pointer;
-    
+    border-radius: 5px;
+    padding: 7px;
+    background-color: #ffffff;
+    box-shadow: none; /* 그림자 제거 */
+    cursor: pointer; /* 마우스 커서 모양 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    border-color: #818181;
+}
+
+/* 마우스를 올렸을 때 스타일 */
+.button-1:hover, .button-plus:hover {
+    background-color: #464646; /* 마우스를 올렸을 때 배경색 */
+    color: #ffffff;
 }
 
 /* 왼쪽 정렬하는 컨테이너 */
 .data-container {
     display: flex;                /* Flexbox 사용 */
     justify-content: flex-start;    /* 오른쪽 정렬 */
-    padding-top: 15px;               /* 버튼 주위에 여백 추가 */
+    padding-top: 34px;               /* 버튼 주위에 여백 추가 */
     padding-left: 70px;
 
 }
@@ -76,21 +135,44 @@ html, body {
 }
 
 .button-plus {
-    font-size: 10px;
+    font-size: 12px;
     cursor: pointer;
+    border-radius: 5px;
+    padding: 3px 8px;
+        background-color: #ffffff;
+    box-shadow: none; /* 그림자 제거 */
+    cursor: pointer; /* 마우스 커서 모양 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    border-color: #818181;
 }
+
 
 .button-container-pred {
     display: flex;  
     align-items: center;
     justify-content: center;
-    margin-top: 30px;
+    margin-top: 70px;
     cursor: pointer;
+    border-top: 1px solid #444444; /* 위쪽에 2픽셀 두께의 검정색 선을 추가 */
+    background-color: #353535;
+
+}
+
+.button-container-pred:hover {
+    background-color: #555555;
 }
 
 .button-pred {
-    font-size: 15px;
-    cursor: pointer;
+    font-size: 17px;
+    background: none; /* 배경색 제거 */
+    border: none; /* 보더 제거 */
+    box-shadow: none; /* 그림자 제거 */
+    padding: 0; /* 기본 패딩 제거 */
+    margin: 0; /* 기본 마진 제거 */
+    cursor: pointer; /* 커서 모양 설정 */
+    outline: none; /* 포커스 시 외곽선 제거 */
+    padding: 30px;
+    color: #ffffff;
 }
 
 /* 본문 영역 패딩 */
@@ -110,6 +192,8 @@ html, body {
     display: none; /* 초기 상태에서는 숨김 */
     justify-content: center;
     align-items: center;
+    z-index: 1001;  /* 다른 요소들 위에 표시되도록 z-index 설정 */
+
 }
 
 /* 모달 내용 스타일 */
@@ -254,6 +338,8 @@ html, body {
     display: none; /* 초기 상태에서는 숨김 */
     justify-content: center;
     align-items: center;
+    z-index: 1001;  /* 다른 요소들 위에 표시되도록 z-index 설정 */
+
 }
 
 /* 모달 내용 스타일 */
@@ -262,7 +348,7 @@ html, body {
     /* padding: 20px; */
     border-radius: 5px;
     width: 80%;
-    max-width:550px;
+    max-width:80;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -443,6 +529,8 @@ html, body {
     display: none; /* 초기 상태에서는 숨김 */
     justify-content: center;
     align-items: center;
+    z-index: 1001;  /* 다른 요소들 위에 표시되도록 z-index 설정 */
+
 }
 
 /* 모달 내용 스타일 */
@@ -521,30 +609,77 @@ html, body {
 }
 
 .item-subject, .item-name, .item-score {
-    background-color: #ffe5e5; /* 연한 빨간색 배경 */
-    border: 1px solid #db4b4b; /* 진한 빨간색 테두리 */
-    border-radius: 5px;        /* 약간 둥근 모서리 */
-    margin-right: 25px;        /* 오른쪽 마진 */
-    padding: 5px 10px;         /* 내용과 테두리 사이 여백 */
-    color: #313131;            /* 텍스트 색상 */
+    background-color: #efefef;
+    border-radius: 5px;
+    margin-right: 25px;
+    padding: 5px 10px;
+    color: #e51919;
     font-size: 13px;
 }
 
 .delete-btn {
-    background-color: #474747;
-    border-color: #444444;
+    background-color: #4b4a4a;
     color: #ffffff;
-    font-size: 12px;
+    font-size: 11px;
     margin: 3px;
-    box-shadow: none; /* 그림자 효과 제거 */
+    box-shadow: none;
     cursor: pointer;
+    padding: 3px 5px;
 }
 
-.hr-data-insert {
-    border: 0.5px solid #c7c7c7; /* 검은색 선 */
-    margin-top: 30px;
+
+.delete-btn:hover {
+    background-color: #575757;
 }
 
 .container-graph {
     padding: 50px;
 }
+
+
+.nanum-gothic-regular {
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .nanum-gothic-bold {
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+  .nanum-gothic-extrabold {
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+  }
+
+
+/* styles.css */
+
+/* styles.css */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr; /* 두 열을 균등하게 나누거나 비율을 조절 */
+}
+
+.data-table thead,
+.data-table tbody {
+    display: contents;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
