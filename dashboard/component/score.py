@@ -28,8 +28,6 @@ def create_modal_score():
                                         children=[
                                             html.Span(f"{i+1}일", className="score-index"),  # 인덱스 표시
                                             dcc.Input(id={"type": "score-input-activae", "index": f"{i+1}-1"}, type="text", className="score-input", placeholder=f"일 감상자수"),  # 첫 번째 인풋
-                                            dcc.Input(id={"type": "score-input-streaming", "index": f"{i+1}-1"}, type="text", className="score-input", placeholder=f"누적 스트리밍수"),  # 두 번째 인풋
-                                            dcc.Input(id={"type": "score-input-listener", "index": f"{i+1}-1"}, type="text", className="score-input", placeholder=f"누적 감상자수"),  # 세 번째 인풋
                                         ]
                                     ) for i in range(30)  # 30개의 세트를 생성
                                 ]

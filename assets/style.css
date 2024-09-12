@@ -1,23 +1,29 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
 /* 기본 여백 제거 */
 html, body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;  /* 요소의 크기 계산 방식 설정 */
     scroll-behavior: smooth;
-
+    font-family: "Noto Sans KR", sans-serif;
 }
 
-
+.xgb-pred-graph {
+    font-family: "Noto Sans KR", sans-serif;
+}
 
 /* ===== 상단바 컴포넌트 ===== */
 /* 상단바 스타일 */
 .navbar {
+    
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;  /* 너비를 100%로 설정하여 전체 화면 너비를 차지하도록 */
     z-index: 1000;  /* 다른 요소들 위에 표시되도록 z-index 설정 */
-    background-color: #292929;  /* 상단바 배경색 */
+    background-color: #0a0a0a;  /* 상단바 배경색 */
     padding: 40px 40px;         /* 상단바 패딩 */
     overflow: hidden;           /* float 요소가 상단바를 벗어나지 않도록 설정 */
     display: flex;  
@@ -105,6 +111,7 @@ html, body {
     cursor: pointer; /* 마우스 커서 모양 */
     text-align: center; /* 텍스트 중앙 정렬 */
     border-color: #818181;
+    font-family: "Noto Sans KR", sans-serif;
 }
 
 /* 마우스를 올렸을 때 스타일 */
@@ -127,7 +134,7 @@ html, body {
 }
 
 .text-song {
-    margin-right: 31px;
+    margin-right: 29px;
 }
 
 .text-score {
@@ -154,12 +161,12 @@ html, body {
     margin-top: 70px;
     cursor: pointer;
     border-top: 1px solid #444444; /* 위쪽에 2픽셀 두께의 검정색 선을 추가 */
-    background-color: #353535;
-
+    background-color: #222222;
+    
 }
 
 .button-container-pred:hover {
-    background-color: #555555;
+    background-color: #313131;
 }
 
 .button-pred {
@@ -173,6 +180,7 @@ html, body {
     outline: none; /* 포커스 시 외곽선 제거 */
     padding: 30px;
     color: #ffffff;
+    font-family: "Noto Sans KR", sans-serif;
 }
 
 /* 본문 영역 패딩 */
@@ -217,6 +225,7 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;    
+    margin-bottom: 10px;
 }
 
 /* 모달 제목 스타일 */
@@ -372,7 +381,7 @@ html, body {
 
 /* 개별 인덱스 항목 간격 스타일 */
 .index-check, .index-artist-id, .index-name, .index-birth, .index-0,
-.index-song-id, .index-subject, .index-release {
+.index-song-id, .index-subject, .index-release, .index-release-time {
     flex: 1; /* 각 항목이 동일한 너비를 차지하게 함 */
     text-align: center; /* 텍스트 중앙 정렬 */
     margin: 0 30px; /*좌우 간격을 추가로 줌 */
@@ -385,7 +394,12 @@ html, body {
     padding: 15px;
 }
 
-.data-song-id, .data-song-subject, .data-song-release {
+.data-song-id, .data-song-subject, .data-song-release .data-song-release-time {
+    margin-right: 25px;
+    padding: 10px;
+}
+
+.data-record-id, .data-record-subject, .data-record-date {
     margin-right: 25px;
     padding: 10px;
 }
@@ -443,28 +457,27 @@ html, body {
     flex: 1; /* 인덱스 열이 전체 너비의 일부를 차지하도록 */
     text-align: right; /* 오른쪽 정렬 */
     padding-right: 10px; /* 값과의 간격 */
-    margin-left: 60px;
 }
 
 /* 값 열 스타일 */
 .value-column {
     flex: 2; /* 값 열이 더 넓게 차지하도록 */
     text-align: left; /* 왼쪽 정렬 */
+    margin-right: 80px;
 }
 
 /* 개별 인덱스 및 값 스타일 */
 .index-artist-id-info, .index-name-info, .index-birth-info, .index-debut-info, .index-activity-info,
 .index-type-info, .index-gender-info, .index-artist-genre-info, .index-agency-info,
-.index-song-id-info, .index-subject-info, .index-genre-info, .index-release-info, .index-type-info {
-    margin: 0 20px; /*좌우 간격을 추가로 줌 */
+.index-song-id-info, .index-subject-info, .index-genre-info, .index-release-info, .index-release-time-info, .index-type-info, .index-artist-info {
     font-weight: bold;
-    margin-bottom: 15px; /* 각 항목 사이의 간격 */
+    margin-bottom: 27px; /* 각 항목 사이의 간격 */
     white-space: nowrap;
 }
 
 .value-artist-id, .value-name, .value-birth, .value-debut, .value-activity,
 .value-type, .value-gender, .value-artist-genre, .value-agency,
-.value-song-id, .value-subject, .value-genre, .value-release, .value-type {
+.value-song-id, .value-subject, .value-genre, .value-release, .value-release-time, .value-album-type, .value-artist-name {
     margin: 0 20px; /*좌우 간격을 추가로 줌 */
     margin-bottom: 15px; /* 각 항목 사이의 간격 */
     white-space: nowrap;
@@ -488,7 +501,7 @@ html, body {
     /* padding: 20px; */
     border-radius: 5px;
     width: 80%;
-    max-width:550px;
+    max-width:600px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -511,12 +524,16 @@ html, body {
     cursor: pointer;
 }
 
-.input-artist-id, .input-name, .input-birth, .input-debut, .input-activity,
-.input-type, .input-gender, .input-artist-genre, .input-agency,
-.input-song-id, .input-subject, .input-genre, .input-release, .input-type {
+.input-artist-id, .input-name, .input-birth, .input-debut, .input-agency,
+.input-song-id, .input-subject,  .input-release {
     margin: 0 20px; /*좌우 간격을 추가로 줌 */
-    margin-bottom: 15px; /* 각 항목 사이의 간격 */
+    margin-bottom: 25px; /* 각 항목 사이의 간격 */
 }
+
+.input-activity, .input-type, .input-gender, .input-artist-genre, .input-genre, .input-type {
+    margin: 0 20px; /*좌우 간격을 추가로 줌 */
+    margin-bottom: 16px; /* 각 항목 사이의 간격 */ 
+} 
 
 /* 모달 배경 스타일 */
 .modal-score {
@@ -590,7 +607,7 @@ html, body {
     font-size: 12px;
 }
 
-.span-output-song, .output-container-score { 
+.output-container-score { 
     margin-left: 20px;
     /* margin-right: 20px; */
 }
@@ -599,7 +616,7 @@ html, body {
     margin-top: 10px;
 }
 
-.output-container-artist {
+.output-container-artist, .output-container-song {
     display: flex;            /* Flexbox 사용 */
     flex-direction: row;      /* 가로 방향 정렬 */
     align-items: center;      /* 세로 방향 중앙 정렬 */
@@ -616,6 +633,8 @@ html, body {
     color: #e51919;
     font-size: 13px;
 }
+
+
 
 .delete-btn {
     background-color: #4b4a4a;

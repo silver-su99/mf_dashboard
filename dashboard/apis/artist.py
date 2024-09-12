@@ -1,27 +1,8 @@
 from flask import request, jsonify
 from flask_restx import Resource, Namespace
-
-from dotenv import load_dotenv
-import os
-from pymongo import MongoClient
-
-load_dotenv()
-# ========== db ==========
-
-connection_string = f"mongodb+srv://{os.getenv('DB_USER')}:1q2w3e4r@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
-client = MongoClient(connection_string) # MongoClient 객체 생성
-
-print()
-print(client)
-print()
-
-db = client['Dashboard']
-artists_collection = db['ArtistMeta']
+from ..database import artists_collection
 
 artist_ns = Namespace("Artist")
-
-
-
 
 @artist_ns.route('')
 class Artists(Resource): 
@@ -37,12 +18,10 @@ class Artists(Resource):
         # 쿼리 필터링
         query = {}
         if artist_id:
-            query['_id'] = int(artist_id)
+            query['artist_id'] = int(artist_id)
         if name:
             query['name'] = {'$regex': name, '$options': 'i'}
         
-
-
         # 데이터 가져오기
         artists = list(artists_collection.find(query).skip((page - 1) * per_page).limit(per_page))
         total = artists_collection.count_documents(query)
@@ -62,20 +41,20 @@ class Artists(Resource):
         data = request.get_json()
 
         # 데이터 유효성 검증
-        required_fields = ['artist_id', 'name', 'birth', 'debut', 'activity', 'artist_type', 'gender', 'artist_genre', 'agency']
+        required_fields = ['artist_id', 'name', 'birth', 'debut', 'activity_year', 'activity_type', 'gender', 'artist_genre_main', 'agency']
         if not all(field in data for field in required_fields):
             return {'message': 'Invalid data'}, 400
 
         # 데이터베이스에 추가할 데이터 구성
         new_artist = {
-            'artist_id': data.get('artist_id'),
+            'artist_id': int(data.get('artist_id')),
             'name': data.get('name'),
             'birth': data.get('birth'),
             'debut': data.get('debut'),
-            'activity': data.get('activity'),
-            'artist_type': data.get('artist_type'),
+            'activity_year': data.get('activity_year'),
+            'activity_type': data.get('activity_type'),
             'gender': data.get('gender'),
-            'genre': data.get('artist_genre'),
+            'artist_genre_main': data.get('artist_genre_main'),
             'agency': data.get('agency')
         }
 
@@ -101,9 +80,11 @@ class ArtistSimple(Resource):
             "name": artist["name"],
             "birth": artist["birth"],
             "debut": artist["debut"],
-            "activity": artist["activity"],
-            "artist_type": artist["artist_type"],
+            "activity_year": artist["activity_year"],
+            "activity_type": artist["activity_type"],
             "gender": artist["gender"],
             "agency": artist["agency"],
-            "genre": artist["genre"]
+            "artist_genre_main": artist["artist_genre_main"]
         }, 200
+    
+

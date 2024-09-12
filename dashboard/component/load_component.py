@@ -8,6 +8,11 @@ from .prediction import create_example_graph
 def load_component(): 
     return html.Div(children=[
 
+            dcc.ConfirmDialog(
+                id='confirm-add-record',
+                message="저장"
+            ),
+
             # 상단바 컴포넌트
             create_navbar(),
 
@@ -33,7 +38,6 @@ def load_component():
             # ===== 상태 변수 =====
             # 상태 저장 컴포넌트
             create_store(),
-
             
             # 스크립트 추가
             dcc.Location(id="url", refresh=False),
@@ -78,10 +82,10 @@ def create_data_insert():
             html.Div(
                 className="button-container",
                 children=[
-                    html.Button('입력값 저장', className='button-1'),
+                    html.Button('입력값 저장', id='add-btn-record', className='button-1'),
 
                     # 버튼을 클릭하여 모달을 열도록 설정
-                    html.Button("이전 기록 불러오기", id="open-modal-btn-previous", className="button-1"),
+                    html.Button("이전 기록 불러오기", id="open-modal-btn-record", className="button-1"),
                 ]
             ),
 
@@ -101,7 +105,7 @@ def create_data_insert():
                 children=[
                     html.Div("곡 정보", className="text-song"),
                     html.Button('+', id="open-modal-btn-song", className='button-plus'),
-                    html.Div(id='output-container-song')
+                    html.Div(id='output-container-song', className='output-container-song')
                 ]
             ),
 
@@ -120,7 +124,7 @@ def create_data_insert():
             html.Div(
                 className="button-container-pred",
                 children=[
-                    html.Button('일감상자수 예측', className='button-pred'),
+                    html.Button('일감상자수 예측', id="pred-btn", className='button-pred'),
                 ]
             ), 
 
@@ -130,7 +134,7 @@ def create_data_insert():
 def create_modal_previous_record(): 
     return  html.Div(
                 className="modal-previous",
-                id="modal-previous",
+                id="modal-record",
                 children=[
                     # 모달 컨텐츠
                     html.Div(
@@ -141,15 +145,15 @@ def create_modal_previous_record():
                                 className="modal-header",
                                 children=[
                                     html.Span("이전 기록 불러오기", className="modal-title"),
-                                    html.Button("X", id="close-modal-btn-previous", className="btn-close-modal")
+                                    html.Button("X", id="close-modal-btn-record", className="btn-close-modal")
                                 ]
                             ),
                             # 중앙: 검색창과 검색 버튼
                             html.Div(
                                 className="modal-search",
                                 children=[ 
-                                    dcc.Input(type="text", placeholder="곡 ID를 입력해주세요.", className="search-input"),
-                                    html.Button("🔍", className="btn-search")
+                                    dcc.Input(type="text", placeholder="곡 ID를 입력해주세요.", id="search-input-record", className="search-input"),
+                                    html.Button("🔍", id="btn-search-record", className="btn-search")
                                 ] 
                             ),
                             # 새로운 중앙 컨텐츠: 인덱스와 리스트
@@ -160,7 +164,6 @@ def create_modal_previous_record():
                                     html.Div(
                                         className="index-header",
                                         children=[
-                                            html.Span("선택", className="index-check"),
                                             html.Span("곡 ID", className="index-id"),
                                             html.Span("제목", className="index-title"),
                                             html.Span("저장날짜", className="index-date"),
@@ -168,20 +171,14 @@ def create_modal_previous_record():
                                     ),
                                     # 데이터 리스트 항목 (샘플 데이터)
                                     html.Div(
-                                        className="data-list",
-                                        children=[
-                                            html.Div(
-                                                className="data-item",
-                                                children=[
-                                                    dcc.Input(type="checkbox", className="data-checkbox"),  # 체크박스 추가
-                                                    html.Span("001", className="data-id"),
-                                                    html.Span("샘플 곡", className="data-title"),
-                                                    html.Span("2024-08-29", className="data-date"),
-                                                ]
-                                            ),
-                                            # 여기에서 추가 항목을 더 넣을 수 있습니다.
-                                        ]
-                                    )
+                                        id='output-container-record-checklist',
+                                    ),
+                                    # 페이지 네비게이션 컴포넌트
+                                    html.Div([
+                                        html.Button('◀', id='prev-button-record', n_clicks=0),
+                                        html.Div(id='output-container-page-info-record', style={'display': 'inline-block', 'margin': '0 10px'}),
+                                        html.Button('▶', id='next-button-record', n_clicks=0)
+                                    ], style={'textAlign': 'center'}),
                                 ]
                             ),                           
                             # 푸터: 삭제 버튼과 불러오기 버튼
@@ -189,7 +186,7 @@ def create_modal_previous_record():
                                 className="modal-footer",
                                 children=[
                                     html.Button("삭제", className="btn-delete"),
-                                    html.Button("불러오기", className="btn-load")
+                                    html.Button("불러오기", id="load-btn-record", className="btn-load")
                                 ]
                             )
                         ]
@@ -201,7 +198,7 @@ def create_modal_previous_record():
 def create_store():
     return html.Div(
         children=[
-            dcc.Store(id='modal-state-previous', data=False),
+            dcc.Store(id='modal-state-record', data=False),
             dcc.Store(id='modal-state-artist', data=False),
             dcc.Store(id='modal-state-info-artist', data=False),
             dcc.Store(id='modal-state-add-artist', data=False),
@@ -210,12 +207,18 @@ def create_store():
             dcc.Store(id='modal-state-add-song', data=False),
             dcc.Store(id='modal-state-score', data=False),
             
-            dcc.Store(id='value-song', data={}),
             dcc.Store(id='value-score', data={}),
 
             dcc.Store(id='model-artist', data=[]),
+            dcc.Store(id='model-song', data={}),
 
             dcc.Store(id='current-page-artist', data=1),
-            dcc.Store(id='total-page-artist', data=100)
+            dcc.Store(id='total-page-artist', data=100),
+
+            dcc.Store(id='current-page-song', data=1),
+            dcc.Store(id='total-page-song', data=100),
+
+            dcc.Store(id='current-page-record', data=1),
+            dcc.Store(id='total-page-record', data=100)
         ]
     )

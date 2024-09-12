@@ -1,4 +1,12 @@
-from dash import html, dcc
+from dash import html, dcc, dash_table
+import pandas as pd
+
+# 샘플 데이터 생성
+df = pd.DataFrame({
+    "Name": ["Alice", "Bob", "Charlie", "David", "Eve"],
+    "Age": [24, 27, 22, 32, 29],
+    "City": ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"]
+})
 
 # 모달3 - 곡 목록 모달창   
 def create_modal_song_list(): 
@@ -31,8 +39,8 @@ def create_modal_song_list():
                             html.Div(
                                 className="modal-search",
                                 children=[ 
-                                    dcc.Input(type="text", placeholder="곡 ID 또는 아티스트 ID를 입력해주세요.", className="search-input"),
-                                    html.Button("🔍", className="btn-search")
+                                    dcc.Input(type="text", placeholder="곡 ID 또는 아티스트 ID를 입력해주세요.", id='search-input-song', className="search-input"),
+                                    html.Button("🔍", id='btn-search-song', className="btn-search")
                                 ] 
                             ),
                             # 새로운 중앙 컨텐츠: 인덱스와 리스트
@@ -50,27 +58,32 @@ def create_modal_song_list():
                                         ]
                                     ),
                                     # 데이터 리스트 항목 (샘플 데이터)
+                                    html.Div(
+                                        id='output-container-song-checklist',
+                                    ),
+
+                                    dash_table.DataTable(
+                                        id='data-table',
+                                        columns=[
+                                            {"name": i, "id": i} for i in df.columns
+                                        ] + [{"name": "Action", "id": "action"}],  # 버튼 열 추가
+                                        data=[
+                                            {**row, 'action': f'Click me {i}'}
+                                            for i, row in df.iterrows()
+                                        ],
+                                        style_table={'overflowX': 'auto'},
+                                        page_size=10,
+                                        editable=True,
+                                        row_selectable='single',
+                                    ),
+
+
+                                    # 페이지 네비게이션 컴포넌트
                                     html.Div([
-                                            dcc.Checklist(
-                                                id='song-checklist',  # ID를 추가합니다.
-                                                className='checklist',
-                                                options=[
-                                                    {   
-                                                        "label": html.Div([
-                                                            html.Span(key, className="data-song-id"),
-                                                            html.Span(song_info[0], className="data-song-subject"),
-                                                            html.Span(song_info[1], className="data-song-release"),
-                                                            html.Button("👀", id=f"open-modal-btn-info-song-{key}", className="btn-more")
-                                                        ], style={'display': 'flex'}),
-                                                        "value": key,
-                                                    }
-                                                    for key, song_info in song_data.items()
-                                                ],
-                                                value=[],  # 초기값을 빈 리스트로 설정
-                                                labelStyle={"display": "flex", "align-items": "center"}
-                                                )
-                                        ]
-                                    )
+                                        html.Button('◀', id='prev-button-song', n_clicks=0),
+                                        html.Div(id='output-container-page-info-song', style={'display': 'inline-block', 'margin': '0 10px'}),
+                                        html.Button('▶', id='next-button-song', n_clicks=0)
+                                    ], style={'textAlign': 'center'}),
                                 ]
                             ),                           
                             # 푸터: 삭제 버튼과 불러오기 버튼
@@ -125,7 +138,8 @@ def create_modal_song_info():
                                                     html.Div("제목", className="index-subject-info"),
                                                     html.Div("발매일", className="index-release-info"),
                                                     html.Div("장르", className="index-genre-info"),
-                                                    html.Div("앨범타입", className="index-type-info")
+                                                    html.Div("앨범타입", className="index-type-info"),
+                                                    html.Div("가수", className="index-type-info")
                                                 ]
                                             ),
                                             # 값 열
@@ -133,6 +147,7 @@ def create_modal_song_info():
                                                 id='output-container-song-info',
                                                 className="value-column",
                                             ),
+                                          
                                         ]
                                     )
                                 ]
@@ -174,20 +189,58 @@ def create_modal_song_add():
                                                 children=[
                                                     html.Div("곡 ID", className="index-song-id-info"),
                                                     html.Div("제목", className="index-subject-info"),
-                                                    html.Div("장르", className="index-genre-info"),
                                                     html.Div("발매일", className="index-release-info"),
-                                                    html.Div("앨범타입", className="index-type-info")
+                                                    html.Div("장르", className="index-genre-info"),
+                                                    html.Div("앨범타입", className="index-type-info"),
+                                                    html.Div("가수", className="index-artist-info"),
                                                 ]
                                             ),
                                             # 값 열
                                             html.Div(
                                                 className="value-column",
                                                 children=[
-                                                    dcc.Input(className="input-song-id", type="text"),
-                                                    dcc.Input(className="input-subject", type="text"),
-                                                    dcc.Input(className="input-genre", type="text"),
-                                                    dcc.Input(className="input-release", type="text"),
-                                                    dcc.Input(className="input-type", type="text"),
+                                                    dcc.Input(id={'type': 'input-song', 'index': 'id'}, className="input-song-id", type="text"),
+                                                    dcc.Input(id={'type': 'input-song', 'index': 'subject'}, className="input-subject", type="text"),
+                                                    dcc.Input(id={'type': 'input-song', 'index': 'release'}, className="input-release", type="text", placeholder="ex) 2024-09-09"),
+                                                    dcc.Dropdown(
+                                                        id={'type': 'input-song', 'index': 'activity'}, 
+                                                        className="input-genre",
+                                                        options=[
+                                                            {'label': '정보 없음', 'value': ''},
+                                                            {'label': 'R&B/Soul', 'value': 'R&B/Soul'},
+                                                            {'label': '국내드라마', 'value': '국내드라마'},
+                                                            {'label': '댄스', 'value': '댄스'},
+                                                            {'label': '랩/힙합', 'value': '랩/힙합'},
+                                                            {'label': '록/메탈', 'value': '록/메탈'},
+                                                            {'label': '발라드', 'value': '발라드'},
+                                                            {'label': '인디음악', 'value': '인디음악'},
+                                                            {'label': '포크/블루스', 'value': '포크/블루스'},
+                                                        ],
+                                                        placeholder='장르 선택 (복수 선택 가능)',  # 기본값
+                                                        multi=True
+                                                    ),
+                                                    dcc.Dropdown(
+                                                        id={'type': 'input-song', 'index': 'album-type'}, 
+                                                        className="input-type",
+                                                        options=[
+                                                            {'label': '정보 없음', 'value': ''},
+                                                            {'label': '싱글', 'value': '싱글'},
+                                                            {'label': 'EP', 'value': 'EP'},
+                                                            {'label': '정규', 'value': '정규'},
+                                                            {'label': 'OST', 'value': 'OST'},
+                                                            {'label': '베스트', 'value': '베스트'},
+                                                            {'label': '옴니버스', 'value': '옴니버스'},
+                                                            {'label': '리믹스', 'value': '리믹스'},
+                                                            {'label': '리메이크', 'value': '리메이크'},
+                                                            {'label': '라이브', 'value': '라이브'},
+                                                            {'label': '스페셜', 'value': '스페셜'},
+                                                        ],
+                                                        placeholder='앨범 타입 선택',  # 기본값
+                                                    ),
+                                                    dcc.Input(id={'type': 'input-song', 'index': 'artist-id'}, 
+                                                              className="input-artist-id", 
+                                                              type="text",
+                                                              placeholder="ex) 00001,00002,00003"),
                                                 ]
                                             ),
                                         ]
@@ -199,7 +252,7 @@ def create_modal_song_add():
                             html.Div(
                                 className="modal-footer-add",
                                 children=[
-                                    html.Button("추가", className="btn-add"),
+                                    html.Button("추가", id='add-btn-song', className="btn-add"),
                                 ]
                             ),
                         ]
