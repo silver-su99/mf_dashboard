@@ -109,6 +109,7 @@ class Predictions(Resource):
                 # 연쇄 예측: 예측일 부터 30일까지 예측 수행 
                 # 아티스트 2명일 때 예측: 기본적으로는 평균을 사용하고, 추가적으로 아티스트 별 버튼, 평균 버튼 생성 
             y_preds = [] 
+            df_y_pred_tmp = pd.DataFrame()  
             # for _, artist in df_artist.iterrows():
             for (_, artist), (_, song) in zip(df_song.iterrows(), df_artist.iterrows()):
                 df_song_repeat = pd.concat([song.to_frame().T]*len(df_record), ignore_index=True)
@@ -141,10 +142,23 @@ class Predictions(Resource):
                 
                 # print(tabulate(df_y_pred, headers='keys', tablefmt='fancy_outline'))
                 y_preds.append(df_y_pred['activaeUser_pred'].values.tolist())
+                if len(df_y_pred_tmp) == 0: 
+                    df_y_pred_tmp = df_y_pred.copy()
+                else: 
+                    df_y_pred_tmp = (df_y_pred_tmp + df_y_pred) / 2 
+
+            df_y_pred_tmp['오차(%)'] = round(abs((df_y_pred_tmp['activaeUser'] - df_y_pred_tmp['activaeUser_pred']) / df_y_pred_tmp['activaeUser']) * 100, 2)
+            df_y_pred_tmp['오차(%)'] = df_y_pred_tmp['오차(%)'].apply(lambda x: f'{x}%').replace("inf%", "")
+            df_y_pred_tmp['activaeUser_pred'] = round(df_y_pred_tmp['activaeUser_pred'])
+            table_dict = df_y_pred_tmp.to_dict('records')
+            table_cols = [{"name": i, "id": i} for i in df_y_pred_tmp.columns]
 
             return {
-                artist_id: y_pred
-                for artist_id, y_pred in zip(artist_ids, y_preds)
+                "pred_by_artist": {
+                                    artist_id: y_pred
+                                    for artist_id, y_pred in zip(artist_ids, y_preds)
+                                   },
+                "table_data": [table_dict, table_cols] 
             }, 200
         
         except Exception as e:

@@ -1,9 +1,10 @@
-from dash import html, dcc, Input, Output, State, ctx, ALL, MATCH
-from dash import callback_context
+from dash import html, dcc, Input, Output, State, ctx, ALL, MATCH, dash_table, callback_context
 import dash
 import requests
 import json
 import math
+import plotly.graph_objs as go
+
 
 def register_callbacks(dash_app1):
     # 콜백 설정
@@ -731,6 +732,7 @@ def register_callbacks(dash_app1):
     @dash_app1.callback(  
         [
             Output("output-container-graph", "children", allow_duplicate=True),
+            Output("output-container-table", "children", allow_duplicate=True),
         ],
 
         [ 
@@ -779,7 +781,18 @@ def register_callbacks(dash_app1):
                                     'color': "rgba(255, 0, 0, 0.8)"  # 선 색깔을 빨간색으로 설정
                                         },
                         } 
-                    ]
+                    ] + \
+                    [go.Scatter(
+                        x=[len(output_activae)],
+                        y=[preds_activae_mean[len(output_activae)-1]],
+                        mode='markers',
+                        name="전 날 예측값",
+                        marker={
+                            'size': 7,
+                            'symbol': 'square',  # 점 모양을 원으로 설정
+                            'color': "rgba(255, 0, 0, 0.5)"      # 색상 설정
+                        },
+                    ) ]
 
                 else:
                     d = [
@@ -793,8 +806,18 @@ def register_callbacks(dash_app1):
                                     'color': "rgba(255, 0, 0, 0.8)"  # 선 색깔을 빨간색으로 설정
                                         },
                         } 
-                         ] 
-
+                         ] + \
+                        [go.Scatter(
+                        x=[len(output_activae)],
+                        y=[preds_activae[0][len(output_activae)-1]],
+                            mode='markers',
+                            name="전 날 예측값",
+                            marker={
+                                'size': 7,
+                                'symbol': 'square',  # 점 모양을 원으로 설정
+                                'color': "rgba(255, 0, 0, 0.5)"      # 색상 설정
+                            },
+                        )] 
                 return d
 
             return dcc.Graph(
@@ -836,7 +859,7 @@ def register_callbacks(dash_app1):
                 )
 
         if not ctx.triggered:
-            return dash.no_update
+            return dash.no_update, dash.no_update
 
         if pred_clicks: 
             # 모든 인풋의 값을 받아옴
@@ -855,9 +878,23 @@ def register_callbacks(dash_app1):
 
                 if response.status_code in (201, 200):
                     response_data = response.json()  # JSON 데이터 파싱
-                    preds_activae = list(response_data.values())
-                    artist_ids = list(response_data.keys())
+                    preds_activae = list(response_data['pred_by_artist'].values())
 
+                    table_dict = response_data['table_data'][0]
+                    table_cols = response_data['table_data'][1]
+                    
+                    output_table = dash_table.DataTable(
+                                                        data=table_dict, 
+                                                        columns=table_cols,
+                                                        page_size=11,  
+                                                        style_table={'width': '50%'},  # 테이블의 너비를 50%로 설정
+                                                        style_header={
+                                                                        'backgroundColor': "#222222",  # 헤더의 배경색
+                                                                        'color': 'white',           # 헤더의 텍스트 색
+                                                                        'fontWeight': 'bold'        # 헤더 텍스트 굵게
+                                                                     },
+                                                        style_cell={'textAlign': 'center'},  # 셀의 텍스트 정렬
+                                                        )
 
                 else:
                     song_message = response_data.get('message')  # 응답에서 message 추출
@@ -867,11 +904,9 @@ def register_callbacks(dash_app1):
             except requests.RequestException as e:
                 print(f"Error sending data: {e}")
 
-    
-
-               
-            return [ create_graph(output_activae, preds_activae, data_artist, data_song) ]
-             
+        
+            return [ create_graph(output_activae, preds_activae, data_artist, data_song) ], [ output_table ]
+        
         return dash.no_update, dash.no_update
 
 
