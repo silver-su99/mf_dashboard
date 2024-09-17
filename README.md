@@ -9,10 +9,15 @@ $ {your venv name}\Scripts\activate
    
 2. download packages
 ```python
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 
 3. mf_dashboard/models 안에 xgb, encoder 모델 파일 넣기   
 
-4. mf_dashboard/.env 파일 작성 
+4. mf_dashboard/.env 파일 작성
+
+5. 앱 실행
+```
+$ python app.py
+``` 
  
