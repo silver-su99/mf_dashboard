@@ -12,7 +12,7 @@ $ {your venv name}\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. put xgb, encoder file in the mf_dashboard/models folder
+3. mf_dashboard/models 안에 xgb, encoder 모델 파일 넣기   
 
 4. mf_dashboard/.env 파일 작성 
  
