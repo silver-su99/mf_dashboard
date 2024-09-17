@@ -876,6 +876,7 @@ def register_callbacks(dash_app1):
                 url = "http://localhost:5000/predictions"  # Flask API의 POST 엔드포인트
                 response = requests.post(url, json=data)
 
+
                 if response.status_code in (201, 200):
                     response_data = response.json()  # JSON 데이터 파싱
                     preds_activae = list(response_data['pred_by_artist'].values())
