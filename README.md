@@ -4,7 +4,7 @@
 $ cd {your directory}
 $ python3 -m venv ./{your venv name}
 $ source {your venv name}/bin/activate # mac os
-$ {your venv name}\Scripts\activate 
+$ {your venv name}\Scripts\activate # window 
 ```
    
 2. download packages
