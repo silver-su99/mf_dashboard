@@ -707,3 +707,16 @@ html, body {
     justify-content: center;
     margin: 20px; /* 필요에 따라 여백을 추가할 수 있습니다 */
 }
+
+
+
+/* footer.css */
+footer {
+    text-align: center;
+    padding: 2em;
+    position: relative; /* Use 'fixed' if you want it always visible at the bottom */
+    bottom: 0;
+    width: 100%;
+    background-color: #232323;
+    margin-top: 50px;
+}

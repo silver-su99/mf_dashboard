@@ -21,6 +21,8 @@ def load_component():
             
             # 메인 시각화 컴포넌트 
             create_example_graph(),
+
+
             
             # ===== 모달 ===== 
             # [ 이전 기록 불러오기 ]
@@ -35,6 +37,8 @@ def load_component():
             # [ 음원 성적 입력 ]
             create_modal_score(),
 
+
+
             # ===== 상태 변수 =====
             # 상태 저장 컴포넌트
             create_store(),
@@ -42,6 +46,9 @@ def load_component():
             # 스크립트 추가
             dcc.Location(id="url", refresh=False),
             html.Script(src="/assets/scroll.js"),
+
+            # 하단 푸터 컴포넌트 
+            # create_footer(),
 
         ])
 
@@ -70,6 +77,15 @@ def create_navbar():
             )
         ],
     )
+
+
+# ===== 상단바 컴포넌트 =====
+def create_footer():
+    return     html.Footer(
+        children="© 2024 Your Company",
+    )
+
+
 
 # ===== 데이터 입력 컴포넌트 =====
 def create_data_insert():  
