@@ -1,6 +1,10 @@
 models/
 mf_venv
 
+Dockerfile
+docker-compose.yml
+nginx/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
