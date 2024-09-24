@@ -56,9 +56,8 @@ class Records(Resource):
             'total': total,
             'current_page': page,
             'per_page': per_page,
-            'records': {record['song_id']: [record['subject'], format_date(record['created_at'])] for record in records},
-            # 'artists': {artist['artist_id']: [artist['name']] for artist in artists}
-        }
+            'df_records': [{"곡ID": record['song_id'], "제목": record['subject'], '저장날짜': format_date(record['created_at'])} for record in records]
+                            }
 
         return jsonify(result)
 

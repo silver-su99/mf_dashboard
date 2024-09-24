@@ -1,10 +1,10 @@
-from dash import html, dcc, Input, Output, State, ctx, ALL, MATCH, dash_table, callback_context
+from dash import html, dcc, Input, Output, State, ctx, ALL, dash_table, callback_context
 import dash
 import requests
-import json
 import math
 import plotly.graph_objs as go
-
+import pandas as pd
+from config import uri
 
 def register_callbacks(dash_app1):
     # 콜백 설정
@@ -27,29 +27,26 @@ def register_callbacks(dash_app1):
         [
             Output("modal-artist", "style", allow_duplicate=True),
             Output("modal-state-artist", "data", allow_duplicate=True),
-            Output('output-container-artist-checklist', 'children'),
-            Output("output-container-page-info-artist", "children"),
-            Output('current-page-artist', 'data'),
-            Output("search-input-artist", "value", allow_duplicate=True)
+            Output("search-input-artist", "value", allow_duplicate=True),
+            Output('table-artist', 'data'),
         ],
         [
             Input("open-modal-btn-artist", "n_clicks"),
             Input("close-modal-btn-artist", "n_clicks"),
-            Input("prev-button-artist", "n_clicks"),
-            Input("next-button-artist", "n_clicks"),
             Input("search-input-artist", "n_submit"),
             Input("btn-search-artist", "n_clicks"),
-            Input("search-input-artist", "value")
+            Input("search-input-artist", "value"),
+            Input('table-artist', 'page_current'),
+            Input('table-artist', 'page_size'),
+            Input('table-artist', 'selected_rows')
         ],
         [
             State("modal-artist", "style"),
-            State("modal-state-artist", "data"),
-            State('current-page-artist', 'data'),
-            State('total-page-artist', 'data')
+            State("modal-state-artist", "data")
         ],
         prevent_initial_call="initial_duplicate",
     )
-    def handle_modal_and_update_output_artist(open_clicks, close_clicks, prev_clicks, next_clicks, submit, search_clicks, search_value, style, is_open, current_page, total_page):
+    def handle_modal_and_update_output_artist(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size, selected_rows,  style, is_open):
         
         def request_and_create_result(url):
             def get_value(value, default='N/A'):
@@ -62,60 +59,24 @@ def register_callbacks(dash_app1):
             response.raise_for_status()
             data = response.json()
 
-            artists = data.get('artists', {})
+            df_artists = data.get('df_artists', {})
+            df_artists = pd.DataFrame(df_artists)
             total = data.get('total', 0)
-            total_page = -(-total // per_page)
+            total_page = -(-total // page_size)
             
-            output_div = [
-                dcc.Checklist(
-                    id='artist-checklist',
-                    className='checklist',
-                    options=[
-                        {   
-                            "label": html.Div([
-                                html.Span(key, className="data-artist-id"),
-                                html.Span(get_value(artist[0], default='N/A'), className="data-artist-name"),
-                                html.Span(get_value(artist[1], default='N/A'), className="data-artist-birth"),
-                                html.Button("👀", id={"type":"open-modal-btn-info-artist", "index":key}, className="btn-more")
-                            ],  className='checklist-item'),
-                            "value": [key] + artist,
-                        }
-                        for key, artist in artists.items()
-                    ],
-                    value=[],
-                    labelStyle={"display": "flex", "align-items": "center"}
-                )
-            ]
-
-            output_div_page = [
-                            html.Span(f"{current_page_tmp}"),
-                            html.Span("/"),
-                            html.Span(f"{total_page}")
-                            ]
-            
-            return output_div, output_div_page
+            return df_artists.to_dict('records')
         
         triggered = [p['prop_id'] for p in callback_context.triggered][0]
-        
-        current_page_tmp = current_page
-        
-        if 'prev-button-artist' in triggered: 
-            if current_page > 1:
-               current_page_tmp -= 1    
-             
-        if 'next-button-artist' in triggered: 
-            if current_page < total_page:
-                current_page_tmp += 1 
+        page_current += 1 
 
-        if ('open-modal-btn-artist' in triggered) or ('prev-button-artist' in triggered) or ('next-button-artist' in triggered):
-            per_page = 10 
-            url = f'http://localhost:5000/artists?page={current_page_tmp}&per_page={per_page}'
+        if ('open-modal-btn-artist' in triggered) or ('prev-button-artist' in triggered) or ('next-button-artist' in triggered) or ('table-artist' in triggered):
+            url = f'{uri}/artists?page={page_current}&per_page={page_size}'
             
             try:
 
-                output_div, output_div_page = request_and_create_result(url)
+                dict_artists = request_and_create_result(url)
 
-                return {"display": "flex"}, True, output_div, output_div_page, current_page_tmp, search_value
+                return {"display": "flex"}, True, search_value, dict_artists
 
             except requests.RequestException as e:
                 print('Error fetching data', f'Error: {str(e)}')
@@ -123,27 +84,26 @@ def register_callbacks(dash_app1):
 
         
         if ('search-input-artist.n_submit' in triggered) or ('btn-search-artist' in triggered):
-            per_page = 10 
 
             if search_value.isdigit(): 
-                url = f'http://localhost:5000/artists?page={current_page_tmp}&per_page={per_page}&artist_id={search_value}'
+                url = f'{uri}/artists?page={page_current}&per_page={page_size}&artist_id={search_value}'
             elif type(search_value) == str: 
-                url = f'http://localhost:5000/artists?page={current_page_tmp}&per_page={per_page}&name={search_value}'
+                url = f'{uri}/artists?page={page_current}&per_page={page_size}&name={search_value}'
 
             try:
 
-                output_div, output_div_page = request_and_create_result(url)
+                dict_artists = request_and_create_result(url)
 
-                return {"display": "flex"}, True, output_div, output_div_page, current_page_tmp, search_value
+                return {"display": "flex"}, True, search_value, dict_artists
 
             except requests.RequestException as e:
                 print('Error fetching data', f'Error: {str(e)}')
 
         
         elif 'close-modal-btn-artist' in triggered:
-            return {"display": "none"}, False, dash.no_update, dash.no_update, dash.no_update, ""
+            return {"display": "none"}, False, "", dash.no_update
         
-        return style, is_open, dash.no_update, dash.no_update, dash.no_update, search_value
+        return style, is_open, search_value, dash.no_update
 
 
 
@@ -160,19 +120,23 @@ def register_callbacks(dash_app1):
             Input('load-btn-artist', 'n_clicks'),
         ],
         [
-            State('artist-checklist', 'value'),
             State('model-artist', "data"),
             State("modal-artist", "style"),
             State("modal-state-artist", "data"),
+            State('table-artist', 'selected_rows'),
+            State('table-artist', 'data'),
         ],
         prevent_initial_call=True,
     )
-    def handle_load_button_artist(load_clicks, checked_values, train_data_artist, style, is_open):
-        if not checked_values:
-            return dash.no_update, checked_values, dash.no_update, dash.no_update, ""
-        
-        for val in checked_values:
-            train_data_artist.append({"id": val[0], "name": val[1]})
+    def handle_load_button_artist(load_clicks, train_data_artist, style, is_open, checked_idx, data):
+        if not checked_idx:
+            return dash.no_update,  dash.no_update, dash.no_update, dash.no_update, ""
+    
+
+
+        for idx in checked_idx:
+            val = data[idx]
+            train_data_artist.append({"id": val["아티스트ID"], "name": val["이름"]})
         
         output_list = [
             html.Div(
@@ -217,11 +181,13 @@ def register_callbacks(dash_app1):
         Output("modal-state-info-artist", "data"),
         Output("output-container-artist-info", "children"),],
 
-        [Input({"type":"open-modal-btn-info-artist", "index":ALL}, "n_clicks")]
-        + [ Input("close-modal-btn-info-artist", "n_clicks")],
+        [Input("open-modal-btn-info-artist", "n_clicks"),
+         Input("close-modal-btn-info-artist", "n_clicks")],
 
         [State("modal-info-artist", "style"), 
-        State("modal-state-info-artist", "data")],
+        State("modal-state-info-artist", "data"),
+        State('table-artist', 'selected_rows'),
+        State('table-artist', 'data'),],
     )
     def toggle_modal_artist_info(*args):
 
@@ -236,17 +202,19 @@ def register_callbacks(dash_app1):
         triggered = ctx.triggered[0] if ctx.triggered else None
 
         open_clicks = triggered['value']
-        close_clicks = args[-3]
-        is_open = args[-1]
+        close_clicks = args[1]
+        is_open = args[3]
+        checked_idx = args[-2]
+        data = args[-1]
 
         if open_clicks and (not is_open): 
 
-            json_string = triggered['prop_id'].split(".")[0]
-            artist_id = json.loads(json_string)['index']
+            idx = checked_idx[-1]
+            artist_id = int(data[idx]['아티스트ID'])
 
 
             # Flask API URL
-            url = f'http://localhost:5000/artists/{artist_id}'
+            url = f'{uri}/artists/{artist_id}'
 
 
             # API 요청 보내기
@@ -308,7 +276,7 @@ def register_callbacks(dash_app1):
             data = {keys[i]: v for i, v in enumerate(input_values)}
             
             try:
-                url = "http://localhost:5000/artists"  # Flask API의 POST 엔드포인트
+                url = f"{uri}/artists"  # Flask API의 POST 엔드포인트
                 response = requests.post(url, json=data)
 
                 # 요청이 성공했는지 확인
@@ -336,30 +304,27 @@ def register_callbacks(dash_app1):
         [
             Output("modal-song", "style"),
             Output("modal-state-song", "data"),
-            Output("output-container-song-checklist", "children", allow_duplicate=True),
-            Output("output-container-page-info-song", "value", allow_duplicate=True),
-            Output('current-page-song', 'data'),
-            Output("search-input-song", "value", allow_duplicate=True)
+            Output("search-input-song", "value", allow_duplicate=True),
+            Output('table-song', 'data'),
         ],
         [
             Input("open-modal-btn-song", "n_clicks"),
             Input("close-modal-btn-song", "n_clicks"),
-            Input("prev-button-song", "n_clicks"),
-            Input("next-button-song", "n_clicks"),
             Input("search-input-song", "n_submit"),
             Input("btn-search-song", "n_clicks"),
-            Input("search-input-song", "value")
+            Input("search-input-song", "value"),
+            Input('table-song', 'page_current'),
+            Input('table-song', 'page_size'),
+            Input('table-song', 'selected_rows')
         ],
         [
             State("modal-song", "style"),
-            State("modal-state-song", "data"),
-            State('current-page-song', 'data'),
-            State('total-page-song', 'data')
+            State("modal-state-song", "data"), 
         ],
             prevent_initial_call="initial_duplicate",
 
     )
-    def handle_modal_and_update_output(open_clicks, close_clicks, prev_clicks, next_clicks, submit, search_clicks, search_value, style, is_open, current_page, total_page):
+    def handle_modal_and_update_output(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size, selected_rows,  style, is_open):
         def request_and_create_result(url):
             def get_value(value, default='N/A'):
                 # 확인: value가 nan인지 확인
@@ -371,86 +336,51 @@ def register_callbacks(dash_app1):
             response.raise_for_status()
             data = response.json()
 
-            songs = data.get('songs', {})
+            df_songs = data.get("df_songs", [])
+            df_songs = pd.DataFrame(df_songs)
             total = data.get('total', 0)
-            total_page = -(-total // per_page)
+            total_page = -(-total // page_size)
             
-            output_div = [
-                dcc.Checklist(
-                    id='song-checklist',
-                    className='checklist',
-                    options=[
-                        {   
-                            "label": html.Div([
-                                html.Span(key, className="data-song-id"),
-                                html.Span(get_value(song[0], default='N/A'), className="data-song-name"),
-                                html.Span(get_value(song[1], default='N/A'), className="data-song-birth"),
-                                html.Button("👀", id={"type":"open-modal-btn-info-song", "index":key}, className="btn-more")
-                            ],  className='checklist-item'),
-                            "value": [key] + song,
-                        }
-                        for key, song in songs.items()
-                    ],
-                    value=[],
-                    labelStyle={"display": "flex", "align-items": "center"}
-                )
-            ]
-
-            output_div_page = [
-                            html.Span(f"{current_page_tmp}"),
-                            html.Span("/"),
-                            html.Span(f"{total_page}")
-                            ]
             
-            return output_div, output_div_page
+            return df_songs.to_dict('records')
         
         triggered = [p['prop_id'] for p in callback_context.triggered][0]
-        
-        current_page_tmp = current_page
-        
-        if 'prev-button-song' in triggered: 
-            if current_page > 1:
-               current_page_tmp -= 1    
-             
-        if 'next-button-song' in triggered: 
-            if current_page < total_page:
-                current_page_tmp += 1 
+        page_current = page_current + 1 
 
-        if ('open-modal-btn-song' in triggered) or ('prev-button-song' in triggered) or ('next-button-song' in triggered):
-            per_page = 10 
-            url = f'http://localhost:5000/songs?page={current_page_tmp}&per_page={per_page}'
+
+        if ('open-modal-btn-song' in triggered) or ('prev-button-song' in triggered) or ('next-button-song' in triggered) or ("table-song" in triggered):
+            url = f'{uri}/songs?page={page_current}&per_page={page_size}'
             
             try:
 
-                output_div, output_div_page = request_and_create_result(url)
-
-                return {"display": "flex"}, True, output_div, output_div_page, current_page_tmp, search_value
+                dict_songs = request_and_create_result(url)
+                
+                return {"display": "flex"}, True, search_value, dict_songs
 
             except requests.RequestException as e:
                 print('Error fetching data', f'Error: {str(e)}')
         
         if ('search-input-song.n_submit' in triggered) or ('btn-search-song' in triggered):
-            per_page = 10 
 
             if search_value.isdigit(): 
-                url = f'http://localhost:5000/songs?page={current_page_tmp}&per_page={per_page}&song_id={search_value}'
+                url = f'{uri}/songs?page={page_current}&per_page={page_size}&song_id={search_value}'
             elif type(search_value) == str: 
-                url = f'http://localhost:5000/songs?page={current_page_tmp}&per_page={per_page}&subject={search_value}'
+                url = f'{uri}/songs?page={page_current}&per_page={page_size}&subject={search_value}'
 
             try:
 
-                output_div, output_div_page = request_and_create_result(url)
+                dict_songs = request_and_create_result(url)
 
-                return {"display": "flex"}, True, output_div, output_div_page, current_page_tmp, search_value
+                return {"display": "flex"}, True, search_value, dict_songs
 
             except requests.RequestException as e:
                 print('Error fetching data', f'Error: {str(e)}')
 
         
         elif 'close-modal-btn-song' in triggered:
-            return {"display": "none"}, False, dash.no_update, dash.no_update, dash.no_update, ""
+            return {"display": "none"}, False, "", dash.no_update
         
-        return style, is_open, dash.no_update, dash.no_update, dash.no_update, search_value
+        return style, is_open, search_value, dash.no_update
 
 
     @dash_app1.callback(
@@ -465,20 +395,21 @@ def register_callbacks(dash_app1):
             Input('load-btn-song', 'n_clicks'),
         ],
         [
-            State('song-checklist', 'value'),
+            State('table-song', 'selected_rows'),
+            State('table-song', 'data'),
             State('model-song', "data"),
             State("modal-song", "style"),
             State("modal-state-song", "data"),
         ],
         prevent_initial_call=True,
     )
-    def handle_load_button_artist(load_clicks, checked_values, train_data_song, style, is_open):
+    def handle_load_button_artist(load_clicks, checked_idx, data, train_data_song, style, is_open):
 
-        if not checked_values:
-            return dash.no_update, checked_values, dash.no_update, dash.no_update, ""
-
-        val = checked_values[-1]        
-        train_data_song = {"song_id": val[0], "subject": val[1]}
+        if not checked_idx:
+            return dash.no_update, checked_idx, dash.no_update, dash.no_update, ""
+        
+        val = data[checked_idx[0]]
+        train_data_song = {"song_id": val["곡ID"], "subject": val["제목"]}
         
         
         output_list = [
@@ -520,11 +451,13 @@ def register_callbacks(dash_app1):
         Output("modal-state-info-song", "data"),
         Output("output-container-song-info", "children")],
        
-        [Input({"type":"open-modal-btn-info-song", "index":ALL}, "n_clicks")]
-        + [ Input("close-modal-btn-info-song", "n_clicks")],
+        [Input("open-modal-btn-info-song", "n_clicks"),
+         Input("close-modal-btn-info-song", "n_clicks")],
         
         [State("modal-info-song", "style"), 
-        State("modal-state-info-song", "data")],
+        State("modal-state-info-song", "data"),
+        State('table-song', 'selected_rows'),
+        State('table-song', 'data'),],
     )
     def toggle_modal_song_info(*args):
 
@@ -539,17 +472,18 @@ def register_callbacks(dash_app1):
         triggered = ctx.triggered[0] if ctx.triggered else None
 
         open_clicks = triggered['value']
-        close_clicks = args[-3]
-        is_open = args[-1]
+        close_clicks = args[1]
+        is_open = args[3]
+        idx = args[-2][0]
+        data = args[-1]
 
         if open_clicks and (not is_open): 
 
-            json_string = triggered['prop_id'].split(".")[0]
-            song_id = json.loads(json_string)['index']
-
+            # json_string = triggered['prop_id'].split(".")[0]
+            song_id = int(data[idx]['곡ID'])
 
             # Flask API URL
-            url = f'http://localhost:5000/songs/{song_id}'
+            url = f'{uri}/songs/{song_id}'
 
 
             # API 요청 보내기
@@ -614,7 +548,7 @@ def register_callbacks(dash_app1):
                     data[keys[i]] = v 
             
             try:
-                url = "http://localhost:5000/songs"  # Flask API의 POST 엔드포인트
+                url = f"{uri}/songs"  # Flask API의 POST 엔드포인트
                 response = requests.post(url, json=data)
 
                 # 요청이 성공했는지 확인
@@ -873,7 +807,7 @@ def register_callbacks(dash_app1):
             # 요청, 응답 받아옴  
             # song_id, activaeUsers 를 요청값으로 보냄 
             try:
-                url = "http://localhost:5000/predictions"  # Flask API의 POST 엔드포인트
+                url = f"{uri}/predictions"  # Flask API의 POST 엔드포인트
                 response = requests.post(url, json=data)
 
 
@@ -885,10 +819,11 @@ def register_callbacks(dash_app1):
                     table_cols = response_data['table_data'][1]
                     
                     output_table = dash_table.DataTable(
+                                                        id="table-result",
                                                         data=table_dict, 
                                                         columns=table_cols,
                                                         page_size=11,  
-                                                        style_table={'width': '50%'},  # 테이블의 너비를 50%로 설정
+                                                        # style_table={'width': '80%'},  # 테이블의 너비를 50%로 설정
                                                         style_header={
                                                                         'backgroundColor': "#222222",  # 헤더의 배경색
                                                                         'color': 'white',           # 헤더의 텍스트 색
@@ -932,31 +867,29 @@ def register_callbacks(dash_app1):
 
     @dash_app1.callback(
         [
-            Output("modal-record", "style", allow_duplicate=True),
-            Output("modal-state-record", "data", allow_duplicate=True),
-            Output('output-container-record-checklist', 'children'),
-            Output("output-container-page-info-record", "children"),
-            Output('current-page-record', 'data'),
+            Output("modal-record", "style"),
+            Output("modal-state-record", "data"),
+            Output("search-input-record", "value", allow_duplicate=True),
+            Output('table-record', 'data'),
         ],
         [
             Input("open-modal-btn-record", "n_clicks"),
             Input("close-modal-btn-record", "n_clicks"),
-            Input("prev-button-record", "n_clicks"),
-            Input("next-button-record", "n_clicks"),
             Input("search-input-record", "n_submit"),
             Input("btn-search-record", "n_clicks"),
-            Input("search-input-record", "value")
+            Input("search-input-record", "value"),
+            Input('table-record', 'page_current'),
+            Input('table-record', 'page_size'),
+            Input('table-record', 'selected_rows')
         ],
         [
             State("modal-record", "style"),
-            State("modal-state-record", "data"),
-            State('current-page-record', 'data'),
-            State('total-page-record', 'data')
+            State("modal-state-record", "data"), 
         ],
-        prevent_initial_call="initial_duplicate",
+            prevent_initial_call="initial_duplicate",
+
     )
-    def handle_modal_and_update_output_record(open_clicks, close_clicks, prev_clicks, next_clicks, submit, search_clicks, search_value, style, is_open, current_page, total_page):
-        
+    def handle_modal_and_update_output_record(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size, selected_rows,  style, is_open):
         def request_and_create_result(url):
             def get_value(value, default='N/A'):
                 # 확인: value가 nan인지 확인
@@ -968,85 +901,51 @@ def register_callbacks(dash_app1):
             response.raise_for_status()
             data = response.json()
 
-            records = data.get('records', {})
+            df_records = data.get("df_records", [])
+            df_records = pd.DataFrame(df_records)
             total = data.get('total', 0)
-            total_page = -(-total // per_page)
+            total_page = -(-total // page_size)
             
-            output_div = [
-                dcc.Checklist(
-                    id='record-checklist',
-                    className='checklist',
-                    options=[
-                        {   
-                            "label": html.Div([
-                                html.Span(key, className="data-record-id"),
-                                html.Span(get_value(record[0], default='N/A'), className="data-record-subject"),
-                                html.Span(get_value(record[1], default='N/A'), className="data-record-date"),
-                            ],  className='checklist-item'),
-                            "value": [key] + record,
-                        }
-                        for key, record in records.items()
-                    ],
-                    value=[],
-                    labelStyle={"display": "flex", "align-items": "center"}
-                )
-            ]
-
-            output_div_page = [
-                            html.Span(f"{current_page_tmp}"),
-                            html.Span("/"),
-                            html.Span(f"{total_page}")
-                            ]
             
-            return output_div, output_div_page
+            return df_records.to_dict('records')
         
         triggered = [p['prop_id'] for p in callback_context.triggered][0]
-        
-        current_page_tmp = current_page
-        
-        if 'prev-button-record' in triggered: 
-            if current_page > 1:
-               current_page_tmp -= 1    
-             
-        if 'next-button-record' in triggered: 
-            if current_page < total_page:
-                current_page_tmp += 1 
+        page_current = page_current + 1 
 
-        if ('open-modal-btn-record' in triggered) or ('prev-button-record' in triggered) or ('next-button-record' in triggered):
-            per_page = 10 
-            url = f'http://localhost:5000/records?page={current_page_tmp}&per_page={per_page}'
+
+        if ('open-modal-btn-record' in triggered) or ('prev-button-record' in triggered) or ('next-button-record' in triggered) or ("table-record" in triggered):
+            url = f'{uri}/records?page={page_current}&per_page={page_size}'
             
             try:
 
-                output_div, output_div_page = request_and_create_result(url)
-
-                return {"display": "flex"}, True, output_div, output_div_page, current_page_tmp
+                dict_records = request_and_create_result(url)
+                
+                return {"display": "flex"}, True, search_value, dict_records
 
             except requests.RequestException as e:
                 print('Error fetching data', f'Error: {str(e)}')
         
         if ('search-input-record.n_submit' in triggered) or ('btn-search-record' in triggered):
-            per_page = 10 
 
             if search_value.isdigit(): 
-                url = f'http://localhost:5000/records?page={current_page_tmp}&per_page={per_page}&song_id={search_value}'
+                url = f'{uri}/records?page={page_current}&per_page={page_size}&song_id={search_value}'
             elif type(search_value) == str: 
-                url = f'http://localhost:5000/records?page={current_page_tmp}&per_page={per_page}&subject={search_value}'
+                url = f'{uri}/records?page={page_current}&per_page={page_size}&subject={search_value}'
 
             try:
 
-                output_div, output_div_page = request_and_create_result(url)
+                dict_records = request_and_create_result(url)
 
-                return {"display": "flex"}, True, output_div, output_div_page, current_page_tmp
+                return {"display": "flex"}, True, search_value, dict_records
 
             except requests.RequestException as e:
                 print('Error fetching data', f'Error: {str(e)}')
 
         
         elif 'close-modal-btn-record' in triggered:
-            return {"display": "none"}, False, dash.no_update, dash.no_update, dash.no_update
+            return {"display": "none"}, False, "", dash.no_update
         
-        return style, is_open, dash.no_update, dash.no_update, dash.no_update
+        return style, is_open, search_value, dash.no_update
 
 
 
@@ -1077,7 +976,7 @@ def register_callbacks(dash_app1):
             }
 
             try:
-                url = "http://localhost:5000/records"  # Flask API의 POST 엔드포인트
+                url = f"{uri}/records"  # Flask API의 POST 엔드포인트
                 response = requests.post(url, json=data)
 
                 if response.status_code in (201, 200):
@@ -1115,14 +1014,14 @@ def register_callbacks(dash_app1):
             Input('load-btn-record', 'n_clicks'),
         ],
         [
-            State('record-checklist', 'value'),
             State("modal-record", "style"),
             State("modal-state-record", "data"),
-
+            State('table-record', 'selected_rows'),
+            State('table-record', 'data'),
         ],
         prevent_initial_call=True,
     )
-    def handle_load_button_record(load_clicks, checked_values, style, is_open):
+    def handle_load_button_record(load_clicks, style, is_open, checked_idx, data):
         
         def make_list(lst):
             return lst + [None] * (30-len(lst))
@@ -1132,18 +1031,18 @@ def register_callbacks(dash_app1):
 
         if "load-btn-record" in triggered:
 
-            if not checked_values:
+            if not checked_idx:
                 return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
             
-            val = checked_values[-1]        
-            train_data_song = {"song_id": val[0], "subject": val[1]}
+            val = data[checked_idx[0]    ]
+            train_data_song = {"song_id": val["곡ID"], "subject": val["제목"]}
 
             # 여기서 얻은 song_id로 artist_id들을 불러오고, artist_id에 해당하는 name을 받아야 한다. 
             # song_id로 record 데이터, artist_name 응답받기 
             
-            song_id = train_data_song['song_id']
+            song_id = int(train_data_song['song_id'])
 
-            url = f'http://localhost:5000/records/{song_id}'
+            url = f'{uri}/records/{song_id}'
 
             # API 요청 보내기
             try:

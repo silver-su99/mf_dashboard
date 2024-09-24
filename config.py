@@ -1,7 +1,7 @@
-from dotenv import load_dotenv
 import os
 from pymongo import MongoClient
 
+from dotenv import load_dotenv
 load_dotenv()
 # ========== db ==========
 
@@ -12,3 +12,7 @@ def get_db(db_name):
     db = client[db_name]
 
     return db
+
+
+# ========== 백엔드 URI ========== 
+uri = os.getenv('URI')

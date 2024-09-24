@@ -47,43 +47,15 @@ def create_modal_song_list():
                             html.Div(
                                 className="modal-content",
                                 children=[
-                                    # 인덱스 헤더
-                                    html.Div(
-                                        className="index-header-list",
-                                        children=[
-                                            html.Span("곡 ID", className="index-song-id"),
-                                            html.Span("제목", className="index-subject"),
-                                            html.Span("발매일", className="index-release"),
-                                            html.Span("정보", className="index-0"),
-                                        ]
-                                    ),
-                                    # 데이터 리스트 항목 (샘플 데이터)
-                                    html.Div(
-                                        id='output-container-song-checklist',
-                                    ),
-
                                     dash_table.DataTable(
-                                        id='data-table',
-                                        columns=[
-                                            {"name": i, "id": i} for i in df.columns
-                                        ] + [{"name": "Action", "id": "action"}],  # 버튼 열 추가
-                                        data=[
-                                            {**row, 'action': f'Click me {i}'}
-                                            for i, row in df.iterrows()
-                                        ],
-                                        style_table={'overflowX': 'auto'},
+                                        id='table-song',
+                                        columns=[{"name": i, "id": i} for i in ["곡ID", '제목', '발매일']],
+                                        page_current=0,
                                         page_size=10,
-                                        editable=True,
+                                        page_action='custom',  # 서버 측 페이지네이션 활성화
                                         row_selectable='single',
+                                        selected_rows=[],
                                     ),
-
-
-                                    # 페이지 네비게이션 컴포넌트
-                                    html.Div([
-                                        html.Button('◀', id='prev-button-song', n_clicks=0),
-                                        html.Div(id='output-container-page-info-song', style={'display': 'inline-block', 'margin': '0 10px'}),
-                                        html.Button('▶', id='next-button-song', n_clicks=0)
-                                    ], style={'textAlign': 'center'}),
                                 ]
                             ),                           
                             # 푸터: 삭제 버튼과 불러오기 버튼
@@ -91,6 +63,7 @@ def create_modal_song_list():
                                 className="modal-footer",
                                 children=[
                                     html.Button("곡 정보 추가", id="open-modal-btn-add-song", className="btn-delete"),
+                                    html.Button("상세 정보 보기", id="open-modal-btn-info-song", className="btn-detail"),
                                     html.Button("불러오기", id='load-btn-song', className="btn-load")
                                 ]
                             ),

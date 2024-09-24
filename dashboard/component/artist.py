@@ -1,4 +1,4 @@
-from dash import html, dcc
+from dash import html, dcc, dash_table
 
 # 모달2 - 아티스트 목록 모달창 
 def create_modal_artist_list(): 
@@ -39,26 +39,15 @@ def create_modal_artist_list():
                             html.Div(
                                 className="modal-content",
                                 children=[
-                                    # 인덱스 헤더
-                                    html.Div(
-                                        className="index-header-list",
-                                        children=[
-                                            html.Span("아티스트 ID", className="index-artist-id"),
-                                            html.Span("이름", className="index-name"),
-                                            html.Span("생년월일", className="index-birth"),
-                                            html.Span("정보", className="index-0"),
-                                        ]
+                                    dash_table.DataTable(
+                                        id='table-artist',
+                                        columns=[{"name": i, "id": i} for i in ["아티스트ID", '이름', '생년월일']],
+                                        page_current=0,
+                                        page_size=10,
+                                        page_action='custom',  # 서버 측 페이지네이션 활성화
+                                        row_selectable='multi',
+                                        selected_rows=[],
                                     ),
-                                    # 데이터 리스트 항목 (샘플 데이터)
-                                    html.Div(
-                                        id='output-container-artist-checklist',
-                                    ),
-                                    # 페이지 네비게이션 컴포넌트
-                                    html.Div([
-                                        html.Button('◀', id='prev-button-artist', n_clicks=0),
-                                        html.Div(id='output-container-page-info-artist', style={'display': 'inline-block', 'margin': '0 10px'}),
-                                        html.Button('▶', id='next-button-artist', n_clicks=0)
-                                    ], style={'textAlign': 'center'}),
                                 ]
                             ),                           
                             # 푸터: 삭제 버튼과 불러오기 버튼
@@ -66,6 +55,7 @@ def create_modal_artist_list():
                                 className="modal-footer",
                                 children=[
                                     html.Button("아티스트 정보 추가", id="open-modal-btn-add-artist", className="btn-delete"),
+                                    html.Button("상세 정보 보기", id="open-modal-btn-info-artist", className="btn-detail"),
                                     html.Button("불러오기", id='load-btn-artist', className="btn-load")
                                 ]
                             ),

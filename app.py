@@ -3,7 +3,6 @@ import dash
 from dashboard.component import load_component
 from callbacks import *
 import os 
-import git
 from dashboard import create_app
 
 
@@ -15,19 +14,6 @@ app = create_app()
 @app.route("/") 
 def index(): 
     return render_template('index.html')
-
-@app.route("/update_server", methods=['POST'])
-def webhook(): 
-    if request.method == "POST": 
-        BASE_DIR = os.path.dirname(__file__)
-        repo = git.Repo(BASE_DIR)
-        origin = repo.remotes.origin
-        origin.pull()
-        return "Pythonanywhere 서버에 성공적으로 업로드되었습니다.", 200
-    else: 
-        return "유효하지 않은 이벤트 타입입니다.", 400
-
-
 
 # ===== front ===== 
 # Dash 애플리케이션 인스턴스 생성

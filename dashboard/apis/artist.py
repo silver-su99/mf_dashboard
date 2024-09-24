@@ -31,7 +31,7 @@ class Artists(Resource):
             'total': total,
             'current_page': page,
             'per_page': per_page,
-            'artists': {artist['artist_id']: [artist['name'], artist.get('birth')] for artist in artists}
+            'df_artists': [{"아티스트ID": artist['artist_id'], "이름": artist['name'], '생년월일': artist['birth']} for artist in artists]
         }
 
         return jsonify(result)

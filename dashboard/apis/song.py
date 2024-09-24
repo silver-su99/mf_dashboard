@@ -25,6 +25,7 @@ class Songs(Resource):
         
         # 데이터 가져오기
         songs = list(songs_collection.find(query).skip((page - 1) * per_page).limit(per_page))
+        
 
         total = songs_collection.count_documents(query)
 
@@ -33,7 +34,7 @@ class Songs(Resource):
             'total': total,
             'current_page': page,
             'per_page': per_page,
-            'songs': {song['song_id']: [song['subject'], song.get('release')] for song in songs}
+            'df_songs': [{"곡ID": song['song_id'], "제목": song['subject'], '발매일': song['release']} for song in songs]
         }
 
         return jsonify(result)

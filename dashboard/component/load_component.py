@@ -1,4 +1,4 @@
-from dash import html, dcc
+from dash import html, dcc, dash_table
 from .artist import create_modal_artist_list
 from .song import create_modal_song_list
 from .score import create_modal_score
@@ -36,8 +36,6 @@ def load_component():
 
             # [ 음원 성적 입력 ]
             create_modal_score(),
-
-
 
             # ===== 상태 변수 =====
             # 상태 저장 컴포넌트
@@ -176,25 +174,15 @@ def create_modal_previous_record():
                             html.Div(
                                 className="modal-content",
                                 children=[
-                                    # 인덱스 헤더
-                                    html.Div(
-                                        className="index-header",
-                                        children=[
-                                            html.Span("곡 ID", className="index-id"),
-                                            html.Span("제목", className="index-title"),
-                                            html.Span("저장날짜", className="index-date"),
-                                        ]
+                                    dash_table.DataTable(
+                                        id='table-record',
+                                        columns=[{"name": i, "id": i} for i in ["곡ID", '제목', '저장날짜']],
+                                        page_current=0,
+                                        page_size=10,
+                                        page_action='custom',  # 서버 측 페이지네이션 활성화
+                                        row_selectable='single',
+                                        selected_rows=[],
                                     ),
-                                    # 데이터 리스트 항목 (샘플 데이터)
-                                    html.Div(
-                                        id='output-container-record-checklist',
-                                    ),
-                                    # 페이지 네비게이션 컴포넌트
-                                    html.Div([
-                                        html.Button('◀', id='prev-button-record', n_clicks=0),
-                                        html.Div(id='output-container-page-info-record', style={'display': 'inline-block', 'margin': '0 10px'}),
-                                        html.Button('▶', id='next-button-record', n_clicks=0)
-                                    ], style={'textAlign': 'center'}),
                                 ]
                             ),                           
                             # 푸터: 삭제 버튼과 불러오기 버튼
