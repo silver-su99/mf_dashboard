@@ -12,10 +12,10 @@ def create_app():
 
     # ========== api ==========
     api = Api(app)
-    api.add_namespace(artist_ns, '/artists')
-    api.add_namespace(song_ns, '/songs')
-    api.add_namespace(record_ns, '/records')
-    api.add_namespace(prediction_ns, '/predictions')
+    api.add_namespace(artist_ns, '/api/artists')
+    api.add_namespace(song_ns, '/api/songs')
+    api.add_namespace(record_ns, '/api/records')
+    api.add_namespace(prediction_ns, '/api/predictions')
 
     return app
 

@@ -4,10 +4,12 @@ from dashboard.component import load_component
 from callbacks import *
 import os 
 from dashboard import create_app
+from flask_cors import CORS
 
 
 # ============================== back ============================== 
 app = create_app()
+CORS(app, resources={r"*": {"origins": "*"}})
 
 # ========== 기본 라우터 ==========
 # 인덱스 페이지

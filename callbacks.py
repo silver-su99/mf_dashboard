@@ -47,8 +47,9 @@ def register_callbacks(dash_app1):
         prevent_initial_call="initial_duplicate",
     )
     def handle_modal_and_update_output_artist(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size, selected_rows,  style, is_open):
-        
+         
         def request_and_create_result(url):
+            
             def get_value(value, default='N/A'):
                 # 확인: value가 nan인지 확인
                 if isinstance(value, float) and math.isnan(value):
@@ -58,6 +59,8 @@ def register_callbacks(dash_app1):
             response = requests.get(url)
             response.raise_for_status()
             data = response.json()
+            
+
 
             df_artists = data.get('df_artists', {})
             df_artists = pd.DataFrame(df_artists)
@@ -79,14 +82,17 @@ def register_callbacks(dash_app1):
                 return {"display": "flex"}, True, search_value, dict_artists
 
             except requests.RequestException as e:
+
                 print('Error fetching data', f'Error: {str(e)}')
+                return dash.no_update, is_open, dash.no_update, dash.no_update  # 기본값 반환
 
 
         
         if ('search-input-artist.n_submit' in triggered) or ('btn-search-artist' in triggered):
 
-            if search_value.isdigit(): 
+            if search_value and search_value.isdigit():
                 url = f'{uri}/artists?page={page_current}&per_page={page_size}&artist_id={search_value}'
+
             elif type(search_value) == str: 
                 url = f'{uri}/artists?page={page_current}&per_page={page_size}&name={search_value}'
 
@@ -98,6 +104,7 @@ def register_callbacks(dash_app1):
 
             except requests.RequestException as e:
                 print('Error fetching data', f'Error: {str(e)}')
+                return dash.no_update, is_open, dash.no_update, dash.no_update  # 기본값 반환
 
         
         elif 'close-modal-btn-artist' in triggered:
@@ -132,8 +139,6 @@ def register_callbacks(dash_app1):
         if not checked_idx:
             return dash.no_update,  dash.no_update, dash.no_update, dash.no_update, ""
     
-
-
         for idx in checked_idx:
             val = data[idx]
             train_data_artist.append({"id": val["아티스트ID"], "name": val["이름"]})
@@ -201,7 +206,7 @@ def register_callbacks(dash_app1):
         ctx = callback_context  # 현재의 콜백 컨텍스트를 가져옵니다.
         triggered = ctx.triggered[0] if ctx.triggered else None
 
-        open_clicks = triggered['value']
+        open_clicks = args[0]
         close_clicks = args[1]
         is_open = args[3]
         checked_idx = args[-2]
@@ -263,7 +268,7 @@ def register_callbacks(dash_app1):
     )
     def toggle_modal_artist_add(open_clicks, close_clicks, add_clicks, input_values, style, is_open):
         ctx = callback_context  # 현재의 콜백 컨텍스트를 가져옵니다.
-        triggered = ctx.triggered[0]['prop_id'] if ctx.triggered else None
+        triggered = ctx.triggered[0]['prop_id'] if ctx.triggered else []
 
         if ("open-modal-btn-add-artist" in triggered) and (not is_open): 
             return {"display": "flex"}, True     
@@ -471,10 +476,10 @@ def register_callbacks(dash_app1):
         ctx = callback_context  # 현재의 콜백 컨텍스트를 가져옵니다.
         triggered = ctx.triggered[0] if ctx.triggered else None
 
-        open_clicks = triggered['value']
+        open_clicks = args[0]
         close_clicks = args[1]
         is_open = args[3]
-        idx = args[-2][0]
+        idx = args[-2][0] if args[-2] else 0
         data = args[-1]
 
         if open_clicks and (not is_open): 
@@ -530,7 +535,7 @@ def register_callbacks(dash_app1):
     )
     def toggle_modal_song_add(open_clicks, close_clicks, add_clicks, input_values, style, is_open):
         ctx = callback_context  # 현재의 콜백 컨텍스트를 가져옵니다.
-        triggered = ctx.triggered[0]['prop_id'] if ctx.triggered else None
+        triggered = ctx.triggered[0]['prop_id'] if ctx.triggered else []
 
         if ("open-modal-btn-add-song" in triggered) and (not is_open): 
             return {"display": "flex"}, True     

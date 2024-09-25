@@ -15,4 +15,8 @@ def get_db(db_name):
 
 
 # ========== 백엔드 URI ========== 
-uri = os.getenv('URI')
+if os.getenv("Flask_ENV") == 'development':
+  uri = os.getenv('URI_DEVELOPMENT')
+else: 
+  uri = os.getenv('URI_DEPOLYMENT')
+
