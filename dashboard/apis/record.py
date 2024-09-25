@@ -2,7 +2,6 @@ from flask import request, jsonify
 from flask_restx import Resource, Namespace
 from ..database import records_collection, songs_collection, artists_collection
 from bson import ObjectId
-import json
 from datetime import datetime
 
 record_ns = Namespace("Record")

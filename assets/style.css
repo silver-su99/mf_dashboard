@@ -10,14 +10,11 @@ html, body {
     font-family: "Noto Sans KR", sans-serif;
 }
 
-.xgb-pred-graph {
-    font-family: "Noto Sans KR", sans-serif;
-}
+
 
 /* ===== 상단바 컴포넌트 ===== */
 /* 상단바 스타일 */
 .navbar {
-    
     position: fixed;
     top: 0;
     left: 0;
@@ -675,38 +672,7 @@ html, body {
   }
 
 
-/* styles.css */
 
-/* styles.css */
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr; /* 두 열을 균등하게 나누거나 비율을 조절 */
-}
-
-.data-table thead,
-.data-table tbody {
-    display: contents;
-}
-
-.data-table th,
-.data-table td {
-    border: 1px solid #dddddd;
-    padding: 8px;
-    text-align: left;
-}
-
-.data-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-
-.container-table {
-    display: flex;
-    justify-content: center;
-    margin: 20px; /* 필요에 따라 여백을 추가할 수 있습니다 */
-}
 
 
 
@@ -722,11 +688,11 @@ footer {
 }
 
 div#table-song {
-    width: 500px;
+    width: 100%;
 }
 
 div#table-artist {
-    width: 550px;
+    width: 100%;
 }
 
 div#table-record {
@@ -739,4 +705,8 @@ div#table-record {
 
 input#search-input-song, input#search-input-artist, input#search-input-record {
     width: 60%;
+}
+
+.xgb-pred-graph {
+    font-family: "Noto Sans KR", sans-serif;
 }

@@ -22,8 +22,6 @@ def load_component():
             # 메인 시각화 컴포넌트 
             create_example_graph(),
 
-
-            
             # ===== 모달 ===== 
             # [ 이전 기록 불러오기 ]
             create_modal_previous_record(),
@@ -49,9 +47,6 @@ def load_component():
             # create_footer(),
 
         ])
-
-
-
 
 
 # ===== 상단바 컴포넌트 =====

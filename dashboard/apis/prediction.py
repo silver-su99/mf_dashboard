@@ -1,13 +1,9 @@
-from flask import request, jsonify
 from flask_restx import Resource, Namespace
-from ..database import records_collection, songs_collection, artists_collection
-from bson import ObjectId
-import json
-from datetime import datetime
+from flask import request
+from ..database import songs_collection, artists_collection
 import pandas as pd 
 from preprocessing import *
 import joblib
-from tabulate import tabulate
 # from xgboost import XGBRegressor
 
 prediction_ns = Namespace("Prediction")
@@ -106,8 +102,8 @@ class Predictions(Resource):
             ##### 5. 모델 예측 => artist 별로 예측한다. 
             # 아티스트 1, 아티스트2, ..., 평균 
             # ⭐ 추가 작업
-                # 연쇄 예측: 예측일 부터 30일까지 예측 수행 
-                # 아티스트 2명일 때 예측: 기본적으로는 평균을 사용하고, 추가적으로 아티스트 별 버튼, 평균 버튼 생성 
+                # 연쇄 예측: 예측일 부터 30일까지 예측 수행 ✅
+                # 아티스트 2명 이상일 때 예측: 아티스트 마다 그래프 그려줌, 평균 그래프 그려줌 ✅
             y_preds = [] 
             df_y_pred_tmp = pd.DataFrame()  
             # for _, artist in df_artist.iterrows():

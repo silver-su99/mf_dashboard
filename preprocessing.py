@@ -1,7 +1,6 @@
 import pandas as pd 
 from datetime import datetime
 import holidays
-from tqdm import tqdm 
 
 
 # ===== 기록일 시간 관련 함수 =====
