@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify  
 import dash
 from dashboard.component import load_component
-from callbacks import *
+from callbacks import register_callbacks
 import os 
 from dashboard import create_app
 from flask_cors import CORS
