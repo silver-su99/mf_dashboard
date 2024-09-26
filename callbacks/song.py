@@ -44,6 +44,9 @@ def callback_song(dash_app1):
 
             df_songs = data.get("df_songs", [])
             df_songs = pd.DataFrame(df_songs)
+
+            df_songs['제목'] = df_songs['제목'].apply(lambda x: x[:19] + '...' if len(x) >= 22 else x)
+
             total = data.get('total', 0)
             total_page = -(-total // page_size)
             

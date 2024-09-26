@@ -747,7 +747,7 @@ div#table-record {
     }
 
 
-    .modal-body-list, .modal-body-previous, .modal-body-score {
+    .modal-body-list, .modal-body-previous, .modal-body-score, .modal-body-info {
         width: 100%;
     }
 
@@ -762,6 +762,8 @@ div#table-record {
         padding: 0;
         width: 100%;
         font-size: 11px;
+        white-space: normal; /* 줄바꿈을 허용 */
+        word-wrap: break-word; /* 긴 단어가 있을 경우 줄바꿈 */
     }    
 
     input#search-input-song, input#search-input-artist, input#search-input-record {
@@ -802,6 +804,19 @@ div#table-record {
 
     .output-container-artist, .output-container-song, .output-container-score {
         margin-left: 10px;
+    }
+
+    .index-column {
+        font-size: 11px;
+    }
+
+    .value-column {
+        font-size: 11px;
+    }
+
+    .index-value-container {
+        justify-content: unset;
+        margin-left: 30px;
     }
 
 }
