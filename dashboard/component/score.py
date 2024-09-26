@@ -23,6 +23,8 @@ def create_modal_score():
                             html.Div(
                                 className="modal-content-score",
                                 children=[
+
+                                    
                                     html.Div(
                                         className="score-set",
                                         children=[
