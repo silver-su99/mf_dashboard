@@ -1,7 +1,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
 
-/* 기본 여백 제거 */
+/* ========== 기본 여백 제거  ========== */
 html, body {
     margin: 0;
     padding: 0;
@@ -12,7 +12,36 @@ html, body {
 
 
 
-/* ===== 상단바 컴포넌트 ===== */
+
+
+
+/* ========== 폰트  ========== */
+.nanum-gothic-regular {
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+.nanum-gothic-bold {
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+.nanum-gothic-extrabold {
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+  }
+
+
+
+
+
+
+
+
+/* ========== 상단바 컴포넌트 ========== */
 /* 상단바 스타일 */
 .navbar {
     position: fixed;
@@ -85,7 +114,13 @@ html, body {
 }
 
 
-/* ===== 데이터 입력 컴포넌트 ===== */
+
+
+
+
+
+
+/* ========== 데이터 입력 컴포넌트 ========== */
 
 /* 버튼을 오른쪽 정렬하는 컨테이너 */
 .button-container {
@@ -126,7 +161,7 @@ html, body {
 
 }
 
-.text-artist {
+.text-artist, .text-score {
     margin-right: 15px;
 }
 
@@ -134,9 +169,6 @@ html, body {
     margin-right: 29px;
 }
 
-.text-score {
-    margin-right: 15px;
-}
 
 .button-plus {
     font-size: 12px;
@@ -186,8 +218,49 @@ html, body {
 }
 
 
+.output-container-artist, .output-container-song, .output-container-score {
+    display: flex;            /* Flexbox 사용 */
+    flex-direction: row;      /* 가로 방향 정렬 */
+    align-items: center;      /* 세로 방향 중앙 정렬 */
+    justify-content: flex-start;  /* 왼쪽 정렬 */
+    flex-wrap: wrap;          /* 요소들이 화면에 맞게 자동 줄바꿈 */
+    margin-left: 20px;
+}
+
+.item-subject, .item-name, .item-score {
+    background-color: #efefef;
+    border-radius: 5px;
+    margin-right: 25px;
+    padding: 5px 10px;
+    color: #e51919;
+    font-size: 13px;
+}
+
+.delete-btn {
+    background-color: #4b4a4a;
+    color: #ffffff;
+    font-size: 11px;
+    margin: 3px;
+    box-shadow: none;
+    cursor: pointer;
+    padding: 3px 5px;
+}
+
+.delete-btn:hover {
+    background-color: #575757;
+}
+
+
+
+
+
+
+
+
+/* ========== 모달 전체 ========== */
+
 /* 모달 배경 스타일 */
-.modal-previous {
+.modal-list {
     position: fixed;
     top: 0;
     left: 0;
@@ -202,17 +275,18 @@ html, body {
 }
 
 /* 모달 내용 스타일 */
-.modal-body-previous {
+.modal-body-list {
     background-color: #fff;
     /* padding: 20px; */
     border-radius: 5px;
     width: 80%;
-    max-width: 600px;
+    max-width: 700px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
+
 
 /* 모달 헤더 스타일 */
 .modal-header {
@@ -251,9 +325,18 @@ html, body {
     margin-top: 20px;
 }
 
-/* 검색 입력 필드 스타일 */
-.search-input {
-    width: 70%;
+/* 모달 푸터 스타일 */
+.modal-footer {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-right: 100px;
+}
+
+input#search-input-song, input#search-input-artist, input#search-input-record {
+    width: 60%;
     padding: 5px;
     font-size: 15px;
     margin-right: 10px;
@@ -266,219 +349,21 @@ html, body {
     cursor: pointer;
 }
 
-
-/* 모달 인덱스 헤더 스타일 */
-.index-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between; 
-    padding: 10px 0;
-    border-bottom: 1px solid #ccc;
-    font-size: 15px;
-}
-
-/* 개별 인덱스 항목 간격 스타일 */
-.index-check, .index-id, .index-title, .index-date {
-    flex: 1; /* 각 항목이 동일한 너비를 차지하게 함 */
-    text-align: center; /* 텍스트 중앙 정렬 */
-    margin: 0 30px; 
-    white-space: nowrap;
-}
-
-/* 데이터 리스트 스타일 */
-.data-list {
-    width: 100%;
-    max-height: 200px; /* 리스트의 최대 높이 */
-    overflow-y: auto; /* 스크롤을 위해 추가 */
-    justify-content: space-between; 
-
-}
-
-/* 데이터 항목 스타일 */
-.data-item {
-    width: 100%;
-    display: flex;
-    padding: 10px 0;
-    border-bottom: 1px solid #ccc;
-    font-size: 15px;
-    justify-content: space-between; 
-}
-
-/* 체크박스 스타일 */
-/* .data-checkbox { 
-    margin-right: 15px;
- } */
-
-/* 모달 푸터 스타일 */
-.modal-footer {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 30px;
-    margin-bottom: 30px;
-    margin-right: 100px;
-}
-
-/* 삭제 버튼 스타일 */
-.btn-delete, .btn-detail {
-    margin-right: 10px;
-    cursor: pointer;
-}
-
-/* 불러오기 버튼 스타일 */
-.btn-load {
+/* 삭제, 상세정보, 불러오기 버튼 스타일 */
+.btn-delete, .btn-detail, .btn-load {
     margin-right: 10px;
     cursor: pointer;
 }
 
 
-/* ===== modal - artist ===== */
-/* 모달 배경 스타일 */
-.modal-list {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: none; /* 초기 상태에서는 숨김 */
-    justify-content: center;
-    align-items: center;
-    z-index: 1001;  /* 다른 요소들 위에 표시되도록 z-index 설정 */
-
-}
-
-/* 모달 내용 스타일 */
-.modal-body-list {
-    background-color: #fff;
-    /* padding: 20px; */
-    border-radius: 5px;
-    width: 80%;
-    max-width: 700px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* 모달 인덱스 헤더 스타일 */
-.index-header-list {
-    width: 100%;
-    display: flex;
-    justify-content: space-between; 
-    padding: 20px 0;
-    border-bottom: 1px solid #ccc;
-    font-size: 15px;
-}
-
-.song-checklist {
-    padding: 0;
-    /* margin-right: 5px; */
-}
-
-/* 개별 인덱스 항목 간격 스타일 */
-.index-check, .index-artist-id, .index-name, .index-birth, .index-0,
-.index-song-id, .index-subject, .index-release, .index-release-time {
-    flex: 1; /* 각 항목이 동일한 너비를 차지하게 함 */
-    text-align: center; /* 텍스트 중앙 정렬 */
-    margin: 0 30px; /*좌우 간격을 추가로 줌 */
-    white-space: nowrap;
-}
 
 
-.data-artist-id, .data-artist-name, .data-artist-birth {
-    margin-right: 40px;
-    padding: 15px;
-}
-
-.data-song-id, .data-song-subject, .data-song-release .data-song-release-time {
-    margin-right: 25px;
-    padding: 10px;
-}
-
-.data-record-id, .data-record-subject, .data-record-date {
-    margin-right: 25px;
-    padding: 10px;
-}
-
-.btn-more {
-    padding: 3px 3px;
-    margin: 5px;
-    font-size: 12px;
-}
-
-.modal-info {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: none; /* 초기 상태에서는 숨김 */
-    justify-content: center;
-    align-items: center;
-}
-
-/* 모달 내용 스타일 */
-.modal-body-info {
-    background-color: #fff;
-    /* padding: 20px; */
-    border-radius: 5px;
-    width: 80%;
-    max-width:400px;
-    max-height: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
 
 
-/* 메인 모달 컨텐츠 스타일 */
-.modal-content-info {
-    width: 100%;
-    background-color: #fff;
-    /* padding: 20px; */
-    border-radius: 8px;
-    margin: 20px auto; /* 모달이 가운데로 정렬되도록 */
-}
 
-/* 인덱스와 값을 포함하는 컨테이너 */
-.index-value-container {
-    display: flex; /* Flexbox를 사용하여 인덱스와 값을 나란히 배치 */
-    justify-content: center; /* 두 열 사이에 공간을 균등하게 배분 */
-}
 
-/* 인덱스 열 스타일 */
-.index-column {
-    flex: 1; /* 인덱스 열이 전체 너비의 일부를 차지하도록 */
-    text-align: right; /* 오른쪽 정렬 */
-    padding-right: 10px; /* 값과의 간격 */
-}
 
-/* 값 열 스타일 */
-.value-column {
-    flex: 2; /* 값 열이 더 넓게 차지하도록 */
-    text-align: left; /* 왼쪽 정렬 */
-    margin-right: 80px;
-}
-
-/* 개별 인덱스 및 값 스타일 */
-.index-artist-id-info, .index-name-info, .index-birth-info, .index-debut-info, .index-activity-info,
-.index-type-info, .index-gender-info, .index-artist-genre-info, .index-agency-info,
-.index-song-id-info, .index-subject-info, .index-genre-info, .index-release-info, .index-release-time-info, .index-type-info, .index-artist-info {
-    font-weight: bold;
-    margin-bottom: 27px; /* 각 항목 사이의 간격 */
-    white-space: nowrap;
-}
-
-.value-artist-id, .value-name, .value-birth, .value-debut, .value-activity,
-.value-type, .value-gender, .value-artist-genre, .value-agency,
-.value-song-id, .value-subject, .value-genre, .value-release, .value-release-time, .value-album-type, .value-artist-name {
-    margin: 0 20px; /*좌우 간격을 추가로 줌 */
-    margin-bottom: 27px; /* 각 항목 사이의 간격 */
-    white-space: nowrap;
-}
+/* ========== 모달 - 추가하기 ========== */
 
 .modal-add {
     position: fixed;
@@ -521,6 +406,7 @@ html, body {
     cursor: pointer;
 }
 
+
 .input-artist-id, .input-name, .input-birth, .input-debut, .input-agency,
 .input-song-id, .input-subject,  .input-release {
     margin: 0 20px; /*좌우 간격을 추가로 줌 */
@@ -531,6 +417,140 @@ html, body {
     margin: 0 20px; /*좌우 간격을 추가로 줌 */
     margin-bottom: 16px; /* 각 항목 사이의 간격 */ 
 } 
+
+
+
+
+
+
+
+
+
+
+
+/* ========== modal - 상세 정보 ========== */
+
+.modal-info {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none; /* 초기 상태에서는 숨김 */
+    justify-content: center;
+    align-items: center;
+}
+
+/* 모달 내용 스타일 */
+.modal-body-info {
+    background-color: #fff;
+    /* padding: 20px; */
+    border-radius: 5px;
+    width: 80%;
+    max-width:400px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 메인 모달 컨텐츠 스타일 */
+.modal-content-info {
+    width: 100%;
+    background-color: #fff;
+    /* padding: 20px; */
+    border-radius: 8px;
+    margin: 20px auto; /* 모달이 가운데로 정렬되도록 */
+}
+
+/* 인덱스와 값을 포함하는 컨테이너 */
+.index-value-container {
+    display: flex; /* Flexbox를 사용하여 인덱스와 값을 나란히 배치 */
+    justify-content: center; /* 두 열 사이에 공간을 균등하게 배분 */
+} 
+
+/* 인덱스 열 스타일 */
+.index-column {
+    flex: 1; /* 인덱스 열이 전체 너비의 일부를 차지하도록 */
+    text-align: right; /* 오른쪽 정렬 */
+    padding-right: 10px; /* 값과의 간격 */
+}
+
+/* 값 열 스타일 */
+.value-column {
+    flex: 2; /* 값 열이 더 넓게 차지하도록 */
+    text-align: left; /* 왼쪽 정렬 */
+    margin-right: 80px;
+}
+
+/* 개별 인덱스 및 값 스타일 */
+.index-artist-id-info, .index-name-info, .index-birth-info, .index-debut-info, .index-activity-info,
+.index-type-info, .index-gender-info, .index-artist-genre-info, .index-agency-info,
+.index-song-id-info, .index-subject-info, .index-genre-info, .index-release-info, .index-release-time-info, .index-type-info, .index-artist-info {
+    font-weight: bold;
+    margin-bottom: 27px; /* 각 항목 사이의 간격 */
+    white-space: nowrap;
+}
+
+.value-artist-id, .value-name, .value-birth, .value-debut, .value-activity,
+.value-type, .value-gender, .value-artist-genre, .value-agency,
+.value-song-id, .value-subject, .value-genre, .value-release, .value-release-time, .value-album-type, .value-artist-name {
+    margin: 0 20px; /*좌우 간격을 추가로 줌 */
+    margin-bottom: 27px; /* 각 항목 사이의 간격 */
+    white-space: nowrap;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* ========== modal - record ========== */
+
+/* 모달 배경 스타일 */
+.modal-previous {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none; /* 초기 상태에서는 숨김 */
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;  /* 다른 요소들 위에 표시되도록 z-index 설정 */
+
+}
+
+/* 모달 내용 스타일 */
+.modal-body-previous {
+    background-color: #fff;
+    /* padding: 20px; */
+    border-radius: 5px;
+    width: 80%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+
+
+
+
+
+
+/* ========== modal - score ========== */
 
 /* 모달 배경 스타일 */
 .modal-score {
@@ -544,7 +564,6 @@ html, body {
     justify-content: center;
     align-items: center;
     z-index: 1001;  /* 다른 요소들 위에 표시되도록 z-index 설정 */
-
 }
 
 /* 모달 내용 스타일 */
@@ -604,108 +623,14 @@ html, body {
     font-size: 12px;
 }
 
-.output-container-score { 
-    margin-left: 20px;
-    /* margin-right: 20px; */
-}
-
-.checklist {
-    margin-top: 10px;
-}
-
-.output-container-artist, .output-container-song {
-    display: flex;            /* Flexbox 사용 */
-    flex-direction: row;      /* 가로 방향 정렬 */
-    align-items: center;      /* 세로 방향 중앙 정렬 */
-    justify-content: flex-start;  /* 왼쪽 정렬 */
-    flex-wrap: wrap;          /* 요소들이 화면에 맞게 자동 줄바꿈 */
-    margin-left: 20px;
-}
-
-.item-subject, .item-name, .item-score {
-    background-color: #efefef;
-    border-radius: 5px;
-    margin-right: 25px;
-    padding: 5px 10px;
-    color: #e51919;
-    font-size: 13px;
-}
 
 
 
-.delete-btn {
-    background-color: #4b4a4a;
-    color: #ffffff;
-    font-size: 11px;
-    margin: 3px;
-    box-shadow: none;
-    cursor: pointer;
-    padding: 3px 5px;
-}
 
 
-.delete-btn:hover {
-    background-color: #575757;
-}
-
-.container-graph {
-    padding: 50px;
-}
 
 
-.nanum-gothic-regular {
-    font-family: "Nanum Gothic", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-  }
-  
-  .nanum-gothic-bold {
-    font-family: "Nanum Gothic", sans-serif;
-    font-weight: 700;
-    font-style: normal;
-  }
-  
-  .nanum-gothic-extrabold {
-    font-family: "Nanum Gothic", sans-serif;
-    font-weight: 800;
-    font-style: normal;
-  }
-
-
-/* styles.css */
-
-/* styles.css */
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr; /* 두 열을 균등하게 나누거나 비율을 조절 */
-}
-
-.data-table thead,
-.data-table tbody {
-    display: contents;
-}
-
-.data-table th,
-.data-table td {
-    border: 1px solid #dddddd;
-    padding: 8px;
-    text-align: left;
-}
-
-.data-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-
-.container-table {
-    display: flex;
-    justify-content: center;
-    margin: 20px; /* 필요에 따라 여백을 추가할 수 있습니다 */
-}
-
-
+/* ========== footer ========== */
 
 /* footer.css */
 footer {
@@ -718,13 +643,26 @@ footer {
     margin-top: 50px;
 }
 
-div#table-song {
+
+
+
+
+
+
+
+
+/* ========== table ========== */
+
+.container-table {
+    display: flex;
+    justify-content: center;
+    margin: 20px; /* 필요에 따라 여백을 추가할 수 있습니다 */
+}
+
+div#table-song, div#table-artist {
     width: 100%;
 }
 
-div#table-artist {
-    width: 100%;
-}
 
 div#table-record {
     width: 450px;
@@ -734,10 +672,18 @@ div#table-record {
     width: 600px
 }
 
-input#search-input-song, input#search-input-artist, input#search-input-record {
-    width: 60%;
-}
 
-.xgb-pred-graph {
-    font-family: "Noto Sans KR", sans-serif;
+
+
+/* 대형 데스크탑 (1200px 이상) */
+@media (min-width: 1200px) {
+
+    .text-artist, .text-score, .text-song {
+        font-size: 18px;
+    }
+
+    .text-song {
+        margin-right: 30px;
+    }
+
 }

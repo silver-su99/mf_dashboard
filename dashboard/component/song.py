@@ -10,13 +10,7 @@ df = pd.DataFrame({
 
 # 모달3 - 곡 목록 모달창   
 def create_modal_song_list(): 
-    
-    # 곡 정보 데이터 (곡 ID: [제목, 발매일])
-    song_data = {
-        '000001': ['제목 1', '2021-02-15'],
-        '000002': ['제목 2', '2020-06-10'],
-        '000003': ['제목 3', '2019-11-22']
-    }
+
 
     return html.Div(
                 className="modal-list",
