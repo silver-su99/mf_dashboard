@@ -44,6 +44,8 @@ def callback_record(dash_app1):
 
             df_records = data.get("df_records", [])
             df_records = pd.DataFrame(df_records)
+            if len(df_records) != 0:
+                df_records = df_records.sort_values(by="저장날짜", ascending=False)
             total = data.get('total', 0)
             total_page = -(-total // page_size)
             
