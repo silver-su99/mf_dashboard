@@ -88,7 +88,6 @@ def determine_exam(row):
         return 'no'
 
 
-
 # 'olympic' 또는 'no' 값을 지정하는 함수
 def classify_period(date):
     # 올림픽 기간 정의
@@ -165,7 +164,6 @@ def get_unique(df, var, new_var):
   # groupby와 apply를 사용하여 최적화된 diff 계산
   return df.groupby(["song_id", 'artist_id']).apply(calculate_diff).reset_index(drop=True)
 
-
 # ===== 컬럼 추가 함수 =====
 def add_camulative_avg(df):
     for col in ['activaeUser']:
@@ -183,7 +181,6 @@ def add_column(df):
   df = add_diff_camulative_avg(df)
 
   return df
-
 
 # 라벨 인코더 적용
 def label_encoding(df):
