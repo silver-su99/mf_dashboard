@@ -747,7 +747,7 @@ div#table-record {
     }
 
 
-    .modal-body-list, .modal-body-previous, .modal-body-score, .modal-body-info {
+    .modal-body-list, .modal-body-previous, .modal-body-score, .modal-body-info, .modal-body-add {
         width: 100%;
     }
 
@@ -817,6 +817,11 @@ div#table-record {
     .index-value-container {
         justify-content: unset;
         margin-left: 30px;
+    }
+
+    .index-artist-id-info, .index-name-info, .index-birth-info, .index-debut-info, .index-activity-info, .index-type-info, .index-gender-info, .index-artist-genre-info, .index-agency-info, .index-song-id-info, .index-subject-info, .index-genre-info, .index-release-info, .index-release-time-info, .index-type-info, .index-artist-info {
+        margin-bottom: 33px;
+        margin-left: 10px;
     }
 
 }
