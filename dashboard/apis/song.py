@@ -36,7 +36,7 @@ class Songs(Resource):
             'total': total,
             'current_page': page,
             'per_page': per_page,
-            'df_songs': [{"곡ID": song['song_id'], "제목": song['subject'], '발매일': song['release']} for song in songs]
+            'df_songs': [{"곡ID": song['song_id'], "제목": song['subject']} for song in songs]
         }
 
         return jsonify(result)

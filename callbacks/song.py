@@ -5,7 +5,6 @@ import math
 import pandas as pd
 from config import uri
 
-print(uri)
 
 def callback_song(dash_app1): 
     @dash_app1.callback(
@@ -45,10 +44,8 @@ def callback_song(dash_app1):
 
             df_songs = data.get("df_songs", [])
             df_songs = pd.DataFrame(df_songs)
-            import datetime
-            df_songs['제목'] = df_songs['제목'].apply(lambda x: x[:19] + '...' if len(x) >= 22 else x)
-            df_songs['발매일'] = pd.to_datetime(df_songs['발매일'], format='%a, %d %b %Y %H:%M:%S %Z')
-            df_songs['발매일'] = df_songs['발매일'].dt.year.astype(str) + '-' + df_songs['발매일'].dt.month.astype(str) + '-' + df_songs['발매일'].dt.day.astype(str)
+
+            df_songs['제목'] = df_songs['제목'].apply(lambda x: x[:25] + '...' if len(x) >= 22 else x)
 
             total = data.get('total', 0)
             total_page = -(-total // page_size)

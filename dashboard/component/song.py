@@ -43,7 +43,7 @@ def create_modal_song_list():
                                 children=[
                                     dash_table.DataTable(
                                         id='table-song',
-                                        columns=[{"name": i, "id": i} for i in ["곡ID", '제목', '발매일']],
+                                        columns=[{"name": i, "id": i} for i in ["곡ID", '제목']],
                                         page_current=0,
                                         page_size=10,
                                         page_action='custom',  # 서버 측 페이지네이션 활성화
