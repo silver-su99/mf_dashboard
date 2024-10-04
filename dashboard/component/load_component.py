@@ -218,6 +218,7 @@ def create_store():
             dcc.Store(id='total-page-song', data=100),
 
             dcc.Store(id='current-page-record', data=1),
-            dcc.Store(id='total-page-record', data=100)
+            dcc.Store(id='total-page-record', data=100),
+            dcc.Store(id='model-state', data=1)
         ]
     )

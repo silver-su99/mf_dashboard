@@ -1,4 +1,4 @@
-from dash import html, dcc, Input, Output, State, ctx, ALL, dash_table
+from dash import html, dcc, Input, Output, State, ctx, ALL, dash_table, callback_context
 import dash
 import requests
 import plotly.graph_objs as go
@@ -102,22 +102,26 @@ def callback_score(dash_app1):
         [
             Output("output-container-graph", "children", allow_duplicate=True),
             Output("output-container-table", "children", allow_duplicate=True),
+            Output("model-state", "data")
         ],
 
         [ 
             Input({"type": "score-input-activae", "index": ALL}, "value"),
-            Input("pred-btn", "n_clicks") 
+            Input("pred-btn", "n_clicks"),
+            Input("model-btn-1", "n_clicks"),
+            Input("model-btn-2", "n_clicks"),
         ], 
 
         [   
             State('model-artist', 'data'), 
-            State('model-song', 'data') 
+            State('model-song', 'data'),
+            State('model-state', 'data')
         ],
 
         # 모든 score-input의 value를 Input으로 사용
         prevent_initial_call=True
     )
-    def handle_predict_and_update_graph_score(input_values_activae, pred_clicks, data_artist, data_song):
+    def handle_predict_and_update_graph_score(input_values_activae, pred_clicks, model1_clicks, model2_clicks, data_artist, data_song, model_state):
         def create_graph(output_activae, preds_activae, data_artist, data_song): 
             
             s = data_song['subject']
@@ -229,14 +233,22 @@ def callback_score(dash_app1):
 
         if not ctx.triggered:
             return dash.no_update, dash.no_update
+        
+        triggered = [p['prop_id'] for p in callback_context.triggered][0]
 
-        if pred_clicks: 
+        if ("pred-btn" in triggered) or ('model-btn-1' in triggered) or ('model-btn-2' in triggered): 
             # 모든 인풋의 값을 받아옴
             output_activae = [int(v) for v in input_values_activae if v]
             
+            if 'model-btn-1' in triggered: 
+                model_state = 1
+            elif 'model-btn-2' in triggered: 
+                model_state = 2 
+
             data = {
                 "song_id": data_song['song_id'],
                 "activaeUsers": output_activae,
+                "model_state": model_state
             }
 
             # 요청, 응답 받아옴  
@@ -276,12 +288,29 @@ def callback_score(dash_app1):
                 print(f"Error sending data: {e}")
 
         
-            return [ create_graph(output_activae, preds_activae, data_artist, data_song) ], [ output_table ]
+            return [ create_graph(output_activae, preds_activae, data_artist, data_song) ], [ output_table ], model_state
         
-        return dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, model_state
 
 
+    @dash_app1.callback(
+        [
+            Output("model-btn-1", "style"),
+            Output("model-btn-2", "style"),
+        ],
+        
+        [Input('model-state', 'data')],
 
+        prevent_initial_call=True
+    )
+    def handle_button_color(model_state):
+        # Clear the output and checklist
+        triggered = [p['prop_id'] for p in callback_context.triggered][0]
+        if "model-state" in triggered:
+            if model_state == 1: 
+                return {"background-color": '#3e3e3e', 'color': "white"}, {"background-color": 'white', 'color': "black"}
+            else: 
+                return {"background-color": 'white', 'color': "black"}, {"background-color": '#3e3e3e', 'color': "white"}
 
     @dash_app1.callback(
         [

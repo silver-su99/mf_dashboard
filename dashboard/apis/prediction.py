@@ -3,7 +3,6 @@ from flask import request
 from ..database import songs_collection, artists_collection
 import pandas as pd 
 from preprocessing import *
-import joblib
 # from xgboost import XGBRegressor
 
 prediction_ns = Namespace("Prediction")
@@ -17,7 +16,7 @@ X_cols = ["artist_id", 'day',
       'weekday', 'quarter', 'day_of_year', 'week_of_year', 'is_holiday',
       'is_vacation', 'is_exam', 'season', 'release_year', 'release_month',
       'release_day', 'release_weekday', 'release_quarter', 'release_season',
-      'is_olympic', 'debut_year', 'debut_month', 'debut_day', 'release_age']
+      'is_olympic', 'debut_year', 'debut_month', 'debut_day', 'release_age', 'release_time']
 
 y_col = ['day', 'activaeUser']
 
@@ -32,17 +31,20 @@ class Predictions(Resource):
             data = request.get_json()
 
             # 데이터 유효성 검증: song_id, activaeUsers, streamings, listeners 데이터 받아와야 함 
-            required_fields = ['song_id', "activaeUsers"]
+            required_fields = ['song_id', "activaeUsers", "model_state"]
             if not all(field in data for field in required_fields):
                 return {'message': 'Invalid data'}, 400
             
             song_id = data.get("song_id")
             activaeUsers = data.get("activaeUsers")
+            model_state = data.get("model_state")
+
 
             ##### 2. DB에서 데이터 불러오기 (song, artist)
             # song 
             song = songs_collection.find_one({"song_id": int(song_id)}, {"_id": 0})
             
+
             # artist: song 데이터의 artist_id를 활용하여 불러온다. 
             artist_ids = song['artist_id']
 
@@ -73,6 +75,7 @@ class Predictions(Resource):
             # debut => debut_year debut_month debut_day
             df_artist = parse_debut(df_artist)
 
+
             # record 
             # date => 
             # year month day2 week_of_month weekday quarter day_of_year week_of_year 
@@ -91,13 +94,23 @@ class Predictions(Resource):
             df_record['is_exam'] = df_record.apply(determine_exam, axis=1)
             df_record['is_olympic'] = df_record['date'].apply(classify_period)
             df_record['season'] = df_record['month'].map(parse_season)
-            
+
             # song + record 
             # df_song_repeat = pd.concat([df_song]*len(df_record), ignore_index=True)
             # df_merged = pd.concat([df_song_repeat, df_record], axis=1)
 
             ##### 4. 모델 불러오기
-            xgb  = joblib.load('models/xgb_0911.joblib')
+            import pickle
+
+            file_name = ""
+            if model_state == 1: 
+                file_name = 'xgb_down_1004.pkl'
+            elif model_state == 2: 
+                file_name = 'xgb_1004.pkl'
+
+            with open(f'models/{file_name}', 'rb') as model_file:
+                xgb = pickle.load(model_file)
+
 
             ##### 5. 모델 예측 => artist 별로 예측한다. 
             # 아티스트 1, 아티스트2, ..., 평균 
@@ -108,14 +121,21 @@ class Predictions(Resource):
             df_y_pred_tmp = pd.DataFrame()  
             # for _, artist in df_artist.iterrows():
             for (_, artist), (_, song) in zip(df_song.iterrows(), df_artist.iterrows()):
+
                 df_song_repeat = pd.concat([song.to_frame().T]*len(df_record), ignore_index=True)
+
                 df_merged = pd.concat([df_song_repeat, df_record], axis=1)
+                
 
                 df_artist_repeat = pd.concat([artist.to_frame().T] * len(df_record), ignore_index=True)
                 df_merged_final = pd.concat([df_merged, df_artist_repeat], axis=1)
 
-                df_merged_final["release_age"] = parse_age(df_merged_final)                
+                df_merged_final["release_age"] = parse_age(df_merged_final)       
+                print("#@#@#@$##%%%")         
                 df_merged_final = label_encoding(df_merged_final)
+
+                print("########fesfwesfsf")
+
                 df_merged_final = add_column(df_merged_final)
                  
                 # df_X: 1일 ~ 30일 (입력값) 

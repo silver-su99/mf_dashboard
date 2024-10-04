@@ -5,6 +5,8 @@ import math
 import pandas as pd
 from config import uri
 
+print(uri)
+
 def callback_song(dash_app1): 
     @dash_app1.callback(
         [
@@ -21,7 +23,6 @@ def callback_song(dash_app1):
             Input("search-input-song", "value"),
             Input('table-song', 'page_current'),
             Input('table-song', 'page_size'),
-            Input('table-song', 'selected_rows')
         ],
         [
             State("modal-song", "style"),
@@ -30,7 +31,7 @@ def callback_song(dash_app1):
             prevent_initial_call="initial_duplicate",
 
     )
-    def handle_modal_and_update_output_song(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size, selected_rows,  style, is_open):
+    def handle_modal_and_update_output_song(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size,  style, is_open):
         def request_and_create_result(url):
             def get_value(value, default='N/A'):
                 # 확인: value가 nan인지 확인
@@ -201,11 +202,13 @@ def callback_song(dash_app1):
                 response.raise_for_status()  # HTTP 오류 발생 시 예외 발생
                 song = response.json()  # JSON 형식으로 응답 데이터 파싱
 
+
                 output_list = [
                     html.Div([
                             html.Div(get_value(song, "song_id", default='N/A'), className="value-song-id"),
                             html.Div(get_value(song, "subject", default='N/A'), className="value-subject"),
                             html.Div(get_value(song, "release", default='N/A'), className="value-release"),
+                            html.Div(get_value(song, "release_time", default='N/A'), className="value-release-time"),
                             html.Div(get_value(song, "genre", default='N/A'), className="value-genre"),
                             html.Div(get_value(song, "album_type", default='N/A'), className="value-album-type"),
                             html.Div(get_value(song, "artist_name", default='N/A'), className="value-artist-name")
@@ -248,7 +251,7 @@ def callback_song(dash_app1):
             return {"display": "none"}, False 
         
         if ("add-btn-song" in triggered) and is_open: 
-            keys = ['song_id', 'subject', 'release', 'genre', 'album_type', 'artist_id']
+            keys = ['song_id', 'subject', 'release', 'release_time', 'genre', 'album_type', 'artist_id']
             data = {}
             for i, v in enumerate(input_values):
                 if i == 3:

@@ -187,7 +187,14 @@ def label_encoding(df):
     import joblib
     # import sklearn
     # from sklearn.preprocessing import LabelEncoder
-    label_encoders = joblib.load('models/label_encoder.pkl')
+    label_encoders = joblib.load('models/label_encoder_1003.pkl')
+    # import pickle
+
+
+
+    # with open(f'models/label_encoder_1003.pkl', 'rb') as model_file:
+    #     label_encoders = pickle.load(model_file)
+  
     for column, encoder in label_encoders.items():
         df[column] = encoder.transform(df[column])
     

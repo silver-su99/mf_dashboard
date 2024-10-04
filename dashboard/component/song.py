@@ -104,6 +104,7 @@ def create_modal_song_info():
                                                     html.Div("곡 ID", className="index-song-id-info"),
                                                     html.Div("제목", className="index-subject-info"),
                                                     html.Div("발매일", className="index-release-info"),
+                                                    html.Div("발매시간", className="index-release-time-info"),
                                                     html.Div("장르", className="index-genre-info"),
                                                     html.Div("앨범타입", className="index-type-info"),
                                                     html.Div("가수", className="index-type-info")
@@ -157,6 +158,7 @@ def create_modal_song_add():
                                                     html.Div("곡 ID", className="index-song-id-info"),
                                                     html.Div("제목", className="index-subject-info"),
                                                     html.Div("발매일", className="index-release-info"),
+                                                    html.Div("발매시간", className="index-release-time-info"),
                                                     html.Div("장르", className="index-genre-info"),
                                                     html.Div("앨범타입", className="index-type-info"),
                                                     html.Div("가수", className="index-artist-info"),
@@ -169,6 +171,18 @@ def create_modal_song_add():
                                                     dcc.Input(id={'type': 'input-song', 'index': 'id'}, className="input-song-id", type="text"),
                                                     dcc.Input(id={'type': 'input-song', 'index': 'subject'}, className="input-subject", type="text"),
                                                     dcc.Input(id={'type': 'input-song', 'index': 'release'}, className="input-release", type="text", placeholder="ex) 2024-09-09"),
+                                                    dcc.Dropdown(
+                                                        id={'type': 'input-song', 'index': 'release-time'}, 
+                                                        className="input-release-time",
+                                                        options=[
+                                                            {'label': '정보 없음', 'value': ''},
+                                                            {'label': '18:00', 'value': '18:00'},
+                                                            {'label': '00:00', 'value': '00:00'},
+                                                            {'label': '13:00', 'value': '13:00'},
+                                                        ],
+                                                        placeholder='발매 시간 선택',  # 기본값
+                                                        multi=False
+                                                    ),
                                                     dcc.Dropdown(
                                                         id={'type': 'input-song', 'index': 'activity'}, 
                                                         className="input-genre",

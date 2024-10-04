@@ -21,7 +21,6 @@ def callback_record(dash_app1):
             Input("search-input-record", "value"),
             Input('table-record', 'page_current'),
             Input('table-record', 'page_size'),
-            Input('table-record', 'selected_rows')
         ],
         [
             State("modal-record", "style"),
@@ -30,7 +29,7 @@ def callback_record(dash_app1):
             prevent_initial_call="initial_duplicate",
 
     )
-    def handle_modal_and_update_output_record(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size, selected_rows,  style, is_open):
+    def handle_modal_and_update_output_record(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size,  style, is_open):
         def request_and_create_result(url):
             def get_value(value, default='N/A'):
                 # 확인: value가 nan인지 확인

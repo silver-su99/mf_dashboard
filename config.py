@@ -20,3 +20,4 @@ if os.getenv("FLASK_ENV") == 'development':
 else: 
   uri = os.getenv('URI_DEPOLYMENT')
 
+print(uri)

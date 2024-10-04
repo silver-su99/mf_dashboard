@@ -21,7 +21,6 @@ def callback_artist(dash_app1):
             Input("search-input-artist", "value"),
             Input('table-artist', 'page_current'),
             Input('table-artist', 'page_size'),
-            Input('table-artist', 'selected_rows')
         ],
         [
             State("modal-artist", "style"),
@@ -29,7 +28,7 @@ def callback_artist(dash_app1):
         ],
         prevent_initial_call="initial_duplicate",
     )
-    def handle_modal_and_update_output_artist(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size, selected_rows,  style, is_open):
+    def handle_modal_and_update_output_artist(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size,  style, is_open):
          
         def request_and_create_result(url):            
             def get_value(value, default='N/A'):

@@ -8,6 +8,8 @@ song_ns = Namespace("Song")
 @song_ns.route('')
 class Songs(Resource): 
     def get(self): 
+
+
         # 쿼리 파라미터에서 페이지 번호와 페이지 크기 가져오기 
         page = request.args.get('page', default=1, type=int)
         per_page = request.args.get('per_page', default=10, type=int)
@@ -17,7 +19,7 @@ class Songs(Resource):
         subject = request.args.get('subject', default=None, type=str)
 
         # 쿼리 필터링
-        query = {'test': True}
+        query = {}
         if song_id:
             query['song_id'] = int(song_id)
         if subject:
@@ -44,7 +46,7 @@ class Songs(Resource):
         data = request.get_json()
 
         # 데이터 유효성 검증
-        required_fields = ['song_id', 'subject', 'release', 'genre', 'artist_id']
+        required_fields = ['song_id', 'subject', 'release', 'genre', 'release_time', 'artist_id']
         if not all(field in data for field in required_fields):
             return {'message': 'Invalid data'}, 400
 
@@ -84,22 +86,30 @@ class Songs(Resource):
                 dic_col2lst["prior_release_count"] += 1
                 dic_col2lst["prior_release_gap"].append(prev_release)
             
-
-            dic_col2lst_total['prior_activae'].append(sum( dic_col2lst["prior_activae"])/dic_col2lst["prior_release_count"] )
+            if dic_col2lst["prior_release_count"] == 0: 
+                dic_col2lst_total['prior_activae'] = 0
+            else:
+                dic_col2lst_total['prior_activae'].append(sum( dic_col2lst["prior_activae"])/dic_col2lst["prior_release_count"] )
             dic_col2lst_total['prior_release_count'].append(dic_col2lst["prior_release_count"])
 
-            recent = max(dic_col2lst["prior_release_gap"])
-            # 문자열을 datetime 객체로 변환
-            date1 = datetime.strptime(recent, "%Y-%m-%d")
-            date2 = datetime.strptime(data.get('release'), "%Y-%m-%d")
-           
-            dic_col2lst_total["prior_release_gap"].append((date2 - date1).days)
+            if len(dic_col2lst["prior_release_gap"]) == 0:
+                dic_col2lst_total["prior_release_gap"] = 0
+            else: 
+                recent = max(dic_col2lst["prior_release_gap"])
+                # 문자열을 datetime 객체로 변환
+                date1 = datetime.strptime(recent, "%Y-%m-%d")
+                date2 = datetime.strptime(data.get('release'), "%Y-%m-%d")
+            
+                dic_col2lst_total["prior_release_gap"].append((date2 - date1).days)
 
+        # "1, 8, :, 0, 0"
+        release_time = data.get('release_time')[0] + data.get('release_time')[3] + data.get('release_time')[6] + data.get('release_time')[9] + data.get('release_time')[12]
         # 데이터베이스에 추가할 데이터 구성
         new_song = {
             'song_id': int(data.get('song_id')),
             'subject': data.get('subject'),
             'release': data.get('release'),
+            'release_time': release_time,
             'genre': data.get('genre'),
             'album_type': data.get("album_type"),
             'artist_id': lst_artist_ids,
@@ -130,13 +140,15 @@ class SongSimple(Resource):
 
         name = ', '.join([artist['name'] for artist in artists])
 
+
         if song is None: 
             return {"message": "Artist not found"}, 404
         
         return {
             "song_id": song['song_id'],
             "subject": song["subject"],
-            "release": song["release"],
+            "release": str(song["release"])[:10],
+            "release_time": str(song["release_time"]),
             "genre": song["genre"],
             "album_type": song['album_type'],
             "artist_name": name

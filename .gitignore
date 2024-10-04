@@ -1,5 +1,7 @@
 models/
 mf_venv
+mf
+.DS_Store
 
 Dockerfile
 docker-compose.yml
