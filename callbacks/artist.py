@@ -24,11 +24,13 @@ def callback_artist(dash_app1):
         ],
         [
             State("modal-artist", "style"),
-            State("modal-state-artist", "data")
+            State("modal-state-artist", "data"),
+            State("search-input-artist", "value"),
+            State("dropdown-artist", 'value')
         ],
         prevent_initial_call="initial_duplicate",
     )
-    def handle_modal_and_update_output_artist(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size,  style, is_open):
+    def handle_modal_and_update_output_artist(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size,  style, is_open, search_value_state, dropdown_value_state):
          
         def request_and_create_result(url):            
             def get_value(value, default='N/A'):
@@ -43,47 +45,49 @@ def callback_artist(dash_app1):
 
             df_artists = data.get('df_artists', {})
             df_artists = pd.DataFrame(df_artists)
-            total = data.get('total', 0)
-            total_page = -(-total // page_size)
             
             return df_artists.to_dict('records')
         
         triggered = [p['prop_id'] for p in callback_context.triggered][0]
         page_current += 1 
 
-        if ('open-modal-btn-artist' in triggered) or ('prev-button-artist' in triggered) or ('next-button-artist' in triggered) or ('table-artist' in triggered):
-            url = f'{uri}/artists?page={page_current}&per_page={page_size}'
-            
+        if ('open-modal-btn-artist' in triggered) or ('prev-button-artist' in triggered) or ('next-button-artist' in triggered) or ("table-artist" in triggered) or \
+            ('search-input-artist.n_submit' in triggered) or ('btn-search-artist' in triggered):
+
+            dic = {} 
+
+            dic['page'] = page_current
+            dic['per_page'] = page_size
+
+            if search_value_state != None:
+                if dropdown_value_state == "전체":
+                    if search_value_state.isdigit(): 
+                        dic['artist_id'] = search_value_state 
+                    elif type(search_value_state) == str: 
+                        dic['name'] = search_value_state
+                elif dropdown_value_state == "이름":
+                    dic['name'] = search_value_state
+                else: 
+                    if not search_value_state.isdigit():
+                        dic['artist_id'] = -1
+                    else:
+                        dic['artist_id'] = search_value_state
+
+            query_params = [] 
+            for k, v in dic.items():
+                query_params.append(f"{k}={v}")
+
+            url = f'{uri}/artists?' + '&'.join(query_params)
+
+
             try:
+                dict_songs = request_and_create_result(url)
 
-                dict_artists = request_and_create_result(url)
 
-                return {"display": "flex"}, True, search_value, dict_artists
+                return {"display": "flex"}, True, search_value, dict_songs
 
             except requests.RequestException as e:
-
                 print('Error fetching data', f'Error: {str(e)}')
-                return dash.no_update, is_open, dash.no_update, dash.no_update  # 기본값 반환
-
-
-        
-        if ('search-input-artist.n_submit' in triggered) or ('btn-search-artist' in triggered):
-
-            if search_value and search_value.isdigit():
-                url = f'{uri}/artists?page={page_current}&per_page={page_size}&artist_id={search_value}'
-
-            elif type(search_value) == str: 
-                url = f'{uri}/artists?page={page_current}&per_page={page_size}&name={search_value}'
-
-            try:
-
-                dict_artists = request_and_create_result(url)
-
-                return {"display": "flex"}, True, search_value, dict_artists
-
-            except requests.RequestException as e:
-                print('Error fetching data', f'Error: {str(e)}')
-                return dash.no_update, is_open, dash.no_update, dash.no_update  # 기본값 반환
 
         
         elif 'close-modal-btn-artist' in triggered:

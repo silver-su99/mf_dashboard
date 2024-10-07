@@ -321,6 +321,26 @@ html, body {
     margin: 20px;
 }
 
+/* 모달 드랍다운 스타일 */
+.dropdown {
+    margin-right: 10px;
+}
+
+span#react-select-6--value-item, span#react-select-2--value-item {
+    font-size: 13px;
+    margin-right: 5px;
+}
+
+
+span.Select-arrow {
+    margin-left: 13px;
+}
+
+.modal-checkbox {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
 /* 모달 중앙 콘텐츠 스타일 */
 .modal-search {
     width: 100%;
@@ -328,7 +348,7 @@ html, body {
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 /* 모달 푸터 스타일 */
@@ -834,5 +854,4 @@ div#table-record {
         margin-left: 20px;
     }
     
-
 }

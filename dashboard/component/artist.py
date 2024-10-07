@@ -31,7 +31,19 @@ def create_modal_artist_list():
                             html.Div(
                                 className="modal-search",
                                 children=[ 
-                                    dcc.Input(type="text", placeholder="아티스트 ID를 입력해주세요.", id='search-input-artist', className="search-input"),
+                                    dcc.Dropdown(
+                                        id='dropdown-artist',
+                                        className="dropdown",
+                                        options=[
+                                            {'label': '전체', 'value': '전체'},
+                                            {'label': '이름', 'value': '이름'},
+                                            {'label': 'ID', 'value': 'ID'}
+                                        ],                                    
+                                        value='전체',  # 기본 선택값
+                                        clearable=False,  # 선택 해제 버튼을 숨기고 싶을 때
+                                        style={'font-size': '12px'}  # 글씨 크기 조정
+                                    ),
+                                    dcc.Input(type="text", placeholder="검색어를 입력해주세요.", id='search-input-artist', className="search-input"),
                                     html.Button("🔍", id='btn-search-artist', className="btn-search")
                                 ] 
                             ),

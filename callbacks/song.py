@@ -13,6 +13,7 @@ def callback_song(dash_app1):
             Output("modal-state-song", "data"),
             Output("search-input-song", "value", allow_duplicate=True),
             Output('table-song', 'data'),
+            Output('table-song', 'input')
         ],
         [
             Input("open-modal-btn-song", "n_clicks"),
@@ -22,15 +23,19 @@ def callback_song(dash_app1):
             Input("search-input-song", "value"),
             Input('table-song', 'page_current'),
             Input('table-song', 'page_size'),
+            Input("checkbox-song", 'value'),
         ],
         [
             State("modal-song", "style"),
             State("modal-state-song", "data"), 
+            State("search-input-song", 'value'),
+            State("checkbox-song", 'value'),
+            State("dropdown-song", 'value')
         ],
             prevent_initial_call="initial_duplicate",
 
     )
-    def handle_modal_and_update_output_song(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size,  style, is_open):
+    def handle_modal_and_update_output_song(open_clicks, close_clicks, submit, search_clicks, search_value, page_current, page_size, checked_value, style, is_open, search_value_state, checked_value_state, dropdown_value_state):
         def request_and_create_result(url):
             def get_value(value, default='N/A'):
                 # 확인: value가 nan인지 확인
@@ -46,10 +51,6 @@ def callback_song(dash_app1):
             df_songs = pd.DataFrame(df_songs)
 
             df_songs['제목'] = df_songs['제목'].apply(lambda x: x[:25] + '...' if len(x) >= 22 else x)
-
-            total = data.get('total', 0)
-            total_page = -(-total // page_size)
-            
             
             return df_songs.to_dict('records')
         
@@ -57,39 +58,47 @@ def callback_song(dash_app1):
         page_current = page_current + 1 
 
 
-        if ('open-modal-btn-song' in triggered) or ('prev-button-song' in triggered) or ('next-button-song' in triggered) or ("table-song" in triggered):
-            url = f'{uri}/songs?page={page_current}&per_page={page_size}'
-            
-            try:
+        if ('open-modal-btn-song' in triggered) or ('prev-button-song' in triggered) or ('next-button-song' in triggered) or ("table-song" in triggered) or \
+            ('search-input-song.n_submit' in triggered) or ('btn-search-song' in triggered) or ('checkbox-song' in triggered):
 
+            dic = {} 
+
+            dic['page'] = page_current
+            dic['per_page'] = page_size
+
+            if search_value_state != None:
+                if dropdown_value_state == "전체":
+                    if search_value_state.isdigit() and len(search_value_state)==8: 
+                        dic['song_id'] = search_value_state 
+                    elif type(search_value_state) == str: 
+                        dic['subject'] = search_value_state
+                elif dropdown_value_state == "제목":
+                    dic['subject'] = search_value_state
+                else: 
+                    dic['song_id'] = search_value_state
+            
+            if checked_value_state: 
+                dic['test'] = True
+
+            query_params = [] 
+            for k, v in dic.items():
+                query_params.append(f"{k}={v}")
+
+            url = f'{uri}/songs?' + '&'.join(query_params)
+
+            try:
                 dict_songs = request_and_create_result(url)
                 
-                return {"display": "flex"}, True, search_value, dict_songs
+                return {"display": "flex"}, True, search_value, dict_songs, page_current
 
             except requests.RequestException as e:
                 print('Error fetching data', f'Error: {str(e)}')
-        
-        if ('search-input-song.n_submit' in triggered) or ('btn-search-song' in triggered):
-
-            if search_value.isdigit(): 
-                url = f'{uri}/songs?page={page_current}&per_page={page_size}&song_id={search_value}'
-            elif type(search_value) == str: 
-                url = f'{uri}/songs?page={page_current}&per_page={page_size}&subject={search_value}'
-
-            try:
-
-                dict_songs = request_and_create_result(url)
-
-                return {"display": "flex"}, True, search_value, dict_songs
-
-            except requests.RequestException as e:
-                print('Error fetching data', f'Error: {str(e)}')
-
+    
         
         elif 'close-modal-btn-song' in triggered:
-            return {"display": "none"}, False, "", dash.no_update
+            return {"display": "none"}, False, "", dash.no_update, dash.no_update
         
-        return style, is_open, search_value, dash.no_update
+        return style, is_open, search_value, dash.no_update, dash.no_update
 
 
     @dash_app1.callback(

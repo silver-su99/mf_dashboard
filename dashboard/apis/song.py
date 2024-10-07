@@ -17,6 +17,7 @@ class Songs(Resource):
         # 추가된 쿼리 파라미터
         song_id = request.args.get('song_id', default=None, type=int)
         subject = request.args.get('subject', default=None, type=str)
+        test = request.args.get("test", default=None, type=bool)
 
         # 쿼리 필터링
         query = {}
@@ -24,6 +25,8 @@ class Songs(Resource):
             query['song_id'] = int(song_id)
         if subject:
             query['subject'] = {'$regex': subject, '$options': 'i'}
+        if test: 
+            query['test'] = test
         
         # 데이터 가져오기
         songs = list(songs_collection.find(query).skip((page - 1) * per_page).limit(per_page))

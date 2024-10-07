@@ -29,14 +29,42 @@ def create_modal_song_list():
                                     html.Button("X", id="close-modal-btn-song", className="btn-close-modal")
                                 ]
                             ),
+                            html.Div([
+                                # 체크박스 리스트 구현
+                                dcc.Checklist(
+                                    id='checkbox-song',
+                                    className='modal-checkbox',
+                                    options=[
+                                        {'label': '추가한 곡만 보기', 'value': '1'}
+                                    ],
+                                    labelStyle={
+                                        'display': 'inline-block'
+                                    }
+                                ),
+                            ]),
                             # 중앙: 검색창과 검색 버튼
                             html.Div(
                                 className="modal-search",
                                 children=[ 
-                                    dcc.Input(type="text", placeholder="곡 ID 또는 아티스트 ID를 입력해주세요.", id='search-input-song', className="search-input"),
+                                    dcc.Dropdown(
+                                        id='dropdown-song',
+                                        className="dropdown",
+                                        options=[
+                                            {'label': '전체', 'value': '전체'},
+                                            {'label': '제목', 'value': '제목'},
+                                            {'label': '곡ID', 'value': '곡ID'}
+                                        ],
+                                        value='전체',  # 기본 선택값
+                                        clearable=False,  # 선택 해제 버튼을 숨기고 싶을 때
+                                        style={'font-size': '12px'}  # 글씨 크기 조정
+
+                                    ),
+                                    dcc.Input(type="text", placeholder="검색어를 입력해주세요.", id='search-input-song', className="search-input"),
                                     html.Button("🔍", id='btn-search-song', className="btn-search")
                                 ] 
                             ),
+
+
                             # 새로운 중앙 컨텐츠: 인덱스와 리스트
                             html.Div(
                                 className="modal-content",
