@@ -853,5 +853,35 @@ div#table-record {
         margin-top: 15px;
         margin-left: 20px;
     }
+
+    /* 개별 인덱스 및 값 스타일 */
+    .index-artist-id-info, .index-name-info, .index-birth-info, .index-debut-info, .index-activity-info,
+    .index-type-info, .index-gender-info, .index-artist-genre-info, .index-agency-info,
+    .index-song-id-info, .index-subject-info, .index-genre-info, .index-release-info, .index-release-time-info, .index-type-info, .index-artist-info {
+        margin-bottom: 27px; /* 각 항목 사이의 간격 */
+    }
+
+    .value-artist-id, .value-name, .value-birth, .value-debut, .value-activity,
+    .value-type, .value-gender, .value-artist-genre, .value-agency,
+    .value-song-id, .value-subject, .value-genre, .value-release, .value-release-time, .value-album-type, .value-artist-name {
+        margin: 0 20px; /*좌우 간격을 추가로 줌 */
+        margin-bottom: 27px; /* 각 항목 사이의 간격 */
+    }
     
+    .btn-search {
+        padding: 2px 2px;
+        font-size: 12px;
+    }
+
+    span#react-select-2--value-item, span#react-select-7--value-item {
+        font-size: 10px;
+    }
+
+    .dropdown {
+        font-size: 10px;
+    }
+
+    label {
+        font-size: 13px;
+    }
 }
