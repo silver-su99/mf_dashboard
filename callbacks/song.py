@@ -12,8 +12,7 @@ def callback_song(dash_app1):
             Output("modal-song", "style"),
             Output("modal-state-song", "data"),
             Output("search-input-song", "value", allow_duplicate=True),
-            Output('table-song', 'data'),
-            Output('table-song', 'input')
+            Output('table-song', 'data')
         ],
         [
             Input("open-modal-btn-song", "n_clicks"),
@@ -50,7 +49,8 @@ def callback_song(dash_app1):
             df_songs = data.get("df_songs", [])
             df_songs = pd.DataFrame(df_songs)
 
-            df_songs['제목'] = df_songs['제목'].apply(lambda x: x[:25] + '...' if len(x) >= 22 else x)
+            if len(df_songs) > 0:
+                df_songs['제목'] = df_songs['제목'].apply(lambda x: x[:25] + '...' if len(x) >= 22 else x)
             
             return df_songs.to_dict('records')
         
@@ -75,7 +75,10 @@ def callback_song(dash_app1):
                 elif dropdown_value_state == "제목":
                     dic['subject'] = search_value_state
                 else: 
-                    dic['song_id'] = search_value_state
+                    if not search_value_state.isdigit(): 
+                        dic['song_id'] = -1
+                    else:    
+                        dic['song_id'] = search_value_state
             
             if checked_value_state: 
                 dic['test'] = True
@@ -89,16 +92,16 @@ def callback_song(dash_app1):
             try:
                 dict_songs = request_and_create_result(url)
                 
-                return {"display": "flex"}, True, search_value, dict_songs, page_current
+                return {"display": "flex"}, True, search_value, dict_songs
 
             except requests.RequestException as e:
                 print('Error fetching data', f'Error: {str(e)}')
     
         
         elif 'close-modal-btn-song' in triggered:
-            return {"display": "none"}, False, "", dash.no_update, dash.no_update
+            return {"display": "none"}, False, "", dash.no_update
         
-        return style, is_open, search_value, dash.no_update, dash.no_update
+        return style, is_open, search_value, dash.no_update
 
 
     @dash_app1.callback(
