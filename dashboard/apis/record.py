@@ -140,3 +140,31 @@ class RecordSimple(Resource):
         except Exception as e:
             # 예외 처리
             return {"message": f"An error occurred: {str(e)}"}, 500
+
+
+    def delete(self, song_id):
+        try:
+            # record 조회
+            record = records_collection.find_one({"song_id": song_id}, {"_id": 0})
+            if record is None:
+                return {"message": "Record not found"}, 404
+
+
+            # song 조회
+            song = songs_collection.find_one({'song_id': song_id}, {"artist_id": 1, '_id': 0})
+            if song is None:
+                return {"message": "Song not found"}, 404
+
+
+            # song_id가 일치하는 record 삭제
+            delete_result = records_collection.delete_one({"song_id": song_id})
+
+
+            if delete_result.deleted_count == 0:
+                return {"message": "Record could not be deleted"}, 500
+
+            return {"message": "Record deleted successfully"}, 200
+
+        except Exception as e:
+            # 예외 처리
+            return {"message": f"An error occurred: {str(e)}"}, 500

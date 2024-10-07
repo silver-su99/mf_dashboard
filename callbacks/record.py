@@ -230,3 +230,60 @@ def callback_record(dash_app1):
             except requests.RequestException as e:
 
                 return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, [None]*30, [None]*30, [None]*30
+            
+
+    @dash_app1.callback(
+        [
+            Output('confirm-delete', 'displayed', allow_duplicate=True),
+            Output('confirm-delete', 'message', allow_duplicate=True)
+        ],
+        
+        [
+            Input('delete-btn-record', 'n_clicks')
+        ],
+        
+        [
+            State('table-record', 'selected_rows'),
+            State('table-record', 'data')
+        ],
+
+        prevent_initial_call=True,
+    )
+    def show_confirm_dialog(n_clicks, selected_rows, table_data):
+        ctx = callback_context
+        triggered = ctx.triggered[0]['prop_id']
+        
+        subject = table_data[selected_rows[0]]['제목']
+
+        if ("delete-btn-record" in triggered) and selected_rows:
+            return [True], f"'{subject}'의 기록을 정말 삭제하겠습니까?"  # Show the confirmation dialog
+        
+        return [False], ""
+
+
+    @dash_app1.callback(
+        [Output("confirm-add-record", "message", allow_duplicate=True),
+         Output("confirm-add-record", "displayed", allow_duplicate=True)],
+
+        [Input('confirm-delete', 'submit_n_clicks')],
+        
+        [State('table-record', 'selected_rows'),
+        State('table-record', 'data')],
+
+        prevent_initial_call=True,
+    )
+    def delete_records(confirm_clicks, selected_rows, table_data):
+        if confirm_clicks and selected_rows:
+            # Extract the song_ids of the selected rows
+            song_id = table_data[selected_rows[0]]['곡ID']
+            subject = table_data[selected_rows[0]]['제목']
+
+
+            # Send DELETE request to API for each selected song_id
+            response = requests.delete(f'{uri}/records/{song_id}')
+            if response.status_code == 200:
+                return f"{subject} 기록이 삭제되었습니다!", True
+            elif response.status_code != 200:
+                return f"{subject} 기록 삭제에 실패하였습니다!", True
+
+            return "", False

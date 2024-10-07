@@ -184,10 +184,13 @@ def create_modal_previous_record():
                             html.Div(
                                 className="modal-footer",
                                 children=[
-                                    html.Button("삭제", className="btn-delete"),
+                                    html.Button("삭제", id="delete-btn-record", className="btn-delete"),
                                     html.Button("불러오기", id="load-btn-record", className="btn-load")
                                 ]
-                            )
+                            ),
+                            dcc.ConfirmDialog(
+                                id='confirm-delete',
+                            ),
                         ]
                     )
                 ]
