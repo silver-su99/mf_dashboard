@@ -40,16 +40,35 @@ class Predictions(Resource):
             model_state = data.get("model_state")
 
 
+
             ##### 2. DB에서 데이터 불러오기 (song, artist)
             # song 
             song = songs_collection.find_one({"song_id": int(song_id)}, {"_id": 0})
             
+            # 리스트의 길이에 맞춰 데이터프레임 생성
+            max_length = max(len(song['artist_id']), len(song['avg_prior_activae']), len(song['prior_release_count']), len(song['prior_release_gap']))
+
+            # 데이터프레임 만들기
+            song = {
+                'song_id': [song['song_id']] * max_length,
+                'subject': [song['subject']] * max_length,
+                'release': [song['release']] * max_length,
+                'release_time': [song['release_time']] * max_length,
+                'genre': song['genre'] * max_length,
+                'album_type': [song['album_type']] * max_length,
+                'artist_id': song['artist_id'] ,
+                'artist_cnt': [song['artist_cnt']] * max_length,
+                'avg_prior_activae': song['avg_prior_activae'] ,
+                'prior_release_count': song['prior_release_count'] ,
+                'prior_release_gap': song['prior_release_gap'] ,
+                'test': [song['test']] * max_length
+            }
 
             # artist: song 데이터의 artist_id를 활용하여 불러온다. 
             artist_ids = song['artist_id']
 
             artists = artists_collection.find({"artist_id": {"$in": artist_ids}}, {"_id": 0})
-
+            
             ##### 3. 데이터 전처리 (입력 데이터에 맞는 계산)
             # song 
             df_song = pd.DataFrame(song)  
@@ -59,7 +78,7 @@ class Predictions(Resource):
             # song도 여러개구나.....................
             df_song = parse_release(df_song)
             df_song['release_season'] = df_song['release_month'].map(parse_season)
-            
+
             # artist 
             dic_artist = {}
             for artist in artists: 
@@ -67,6 +86,8 @@ class Predictions(Resource):
                     if k not in dic_artist: 
                         dic_artist[k] = [] 
                     dic_artist[k].append(v)
+
+
 
             df_artist = pd.DataFrame(dic_artist) 
 
@@ -84,7 +105,7 @@ class Predictions(Resource):
 
             df_record = pd.DataFrame({
                 'activaeUser': activaeUsers + [0] * (30-len(activaeUsers)),
-                'date': pd.date_range(start=song['release'], periods=30),
+                'date': pd.date_range(start=song['release'][0], periods=30),
                 'day': list(range(1, 31))
             })
 
@@ -94,6 +115,8 @@ class Predictions(Resource):
             df_record['is_exam'] = df_record.apply(determine_exam, axis=1)
             df_record['is_olympic'] = df_record['date'].apply(classify_period)
             df_record['season'] = df_record['month'].map(parse_season)
+
+
 
             # song + record 
             # df_song_repeat = pd.concat([df_song]*len(df_record), ignore_index=True)
@@ -124,6 +147,9 @@ class Predictions(Resource):
 
                 df_song_repeat = pd.concat([song.to_frame().T]*len(df_record), ignore_index=True)
 
+                print("############")
+                print(df_song_repeat)
+
                 df_merged = pd.concat([df_song_repeat, df_record], axis=1)
                 
 
@@ -131,12 +157,11 @@ class Predictions(Resource):
                 df_merged_final = pd.concat([df_merged, df_artist_repeat], axis=1)
 
                 df_merged_final["release_age"] = parse_age(df_merged_final)       
-                print("#@#@#@$##%%%")         
                 df_merged_final = label_encoding(df_merged_final)
 
-                print("########fesfwesfsf")
-
                 df_merged_final = add_column(df_merged_final)
+
+
                  
                 # df_X: 1일 ~ 30일 (입력값) 
                 # df_y_pred:1일 ~ 31일 (출력값 저장) 
@@ -168,6 +193,7 @@ class Predictions(Resource):
             df_y_pred_tmp['activaeUser_pred'] = round(df_y_pred_tmp['activaeUser_pred'])
             table_dict = df_y_pred_tmp.to_dict('records')
             table_cols = [{"name": i, "id": i} for i in df_y_pred_tmp.columns]
+            
 
             return {
                 "pred_by_artist": {

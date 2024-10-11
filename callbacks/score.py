@@ -209,25 +209,49 @@ def callback_score(dash_app1):
                             },
                         ],
                                             
-                        'layout': {
-                            'title': f"{n} - {s}",
-                            "xaxis":{
+                        'layout': go.Layout(
+                            title=f"{n} - {s}",
+                        
+                            
+                            xaxis = {
                                 'title': 'Days',
                                 'tickmode': 'linear',  # 수동으로 설정
                                 'tick0': 1,            # 첫 번째 틱 마크 위치
-                                'dtick': 1             # 1단위로 틱 마크
+                                'dtick': 1,             # 1단위로 틱 마크
+                                'tickfont': {"size": 10}
                             },
-                            'yaxis': {
-                                'tickformat': ',d',  # 천 단위 구분 없이 정수 형태로 표시
-                            'legend': {
-                                'x': 1,            # x 좌표 (오른쪽으로 1)
-                                'y': 1,            # y 좌표 (위쪽으로 1)
-                                'xanchor': 'right', # x 기준점을 오른쪽으로 설정
-                                'yanchor': 'top',   # y 기준점을 위쪽으로 설정
-                            }
+                            yaxis = {
+                                'tickformat': ',d',  # 천 단위 구분 없이 정수 형태로 표시 
+                                'tickfont': {"size": 10}
+                                },
 
-                            }
-                        }
+                            legend=dict(
+                                x=0.95,  # 범례의 x 좌표 (그래프 안쪽으로)
+                                y=0.95,  # 범례의 y 좌표 (그래프 안쪽으로)
+                                xanchor='right',  # x 기준점을 오른쪽으로 설정
+                                yanchor='top',    # y 기준점을 위쪽으로 설정
+                                bgcolor='rgba(255, 255, 255, 0.5)',  # 범례 배경 반투명 설정
+                                font=dict(
+                                    size=10,  # 폰트 사이즈 설정
+                                    color='black'  # 폰트 색상 설정 (선택적)
+                                )
+                            ),
+
+                            shapes=[  # Vertical line
+                                dict(
+                                    type="line",
+                                    x0=len(output_activae), x1=len(output_activae),  # X 좌표에서 수직선
+                                    y0=0, y1=1,  # Y축 비율 (0 ~ 1은 전체 Y축 범위)
+                                    xref='x',    # X축 기준
+                                    yref='paper', # Y축을 종이 기준으로 (0~1 비율로)
+                                    line=dict(color="rgba(255, 0, 0, 0.6)", width=1, dash="dashdot")  # 선 스타일
+                                )
+                            ]
+
+                            ),
+
+                            # }
+                        # }
                     }
                 )
 

@@ -204,9 +204,20 @@ def create_modal_song_add():
                                                         className="input-release-time",
                                                         options=[
                                                             {'label': '정보 없음', 'value': ''},
-                                                            {'label': '18:00', 'value': '18:00'},
                                                             {'label': '00:00', 'value': '00:00'},
+                                                            {'label': '07:00', 'value': '07:00'},
+                                                            {'label': '08:00', 'value': '08:00'},
+                                                            {'label': '09:00', 'value': '09:00'},
+                                                            {'label': '10:00', 'value': '10:00'},
+                                                            {'label': '11:00', 'value': '11:00'},
+                                                            {'label': '12:00', 'value': '12:00'},
                                                             {'label': '13:00', 'value': '13:00'},
+                                                            {'label': '14:00', 'value': '14:00'},
+                                                            {'label': '17:00', 'value': '17:00'},
+                                                            {'label': '18:00', 'value': '18:00'},
+                                                            {'label': '20:00', 'value': '20:00'},
+                                                            {'label': '22:00', 'value': '22:00'},
+                                                            {'label': '23:00', 'value': '23:00'},
                                                         ],
                                                         placeholder='발매 시간 선택',  # 기본값
                                                         multi=False

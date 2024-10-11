@@ -58,7 +58,7 @@ def create_navbar():
             html.A(
                 id='navbar-title',
                 className="navbar-title",
-                href="#",
+                href="/dashapp1",
                 children="MF",
             ),
             html.Div(
@@ -68,7 +68,7 @@ def create_navbar():
                                 html.A("예측 결과", href="#output-container-graph", className="link-class", id='link-class-2'),
                             ]
             )
-        ],
+        ],  
     )
 
 

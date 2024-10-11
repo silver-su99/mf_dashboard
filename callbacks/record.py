@@ -287,3 +287,4 @@ def callback_record(dash_app1):
                 return f"{subject} 기록 삭제에 실패하였습니다!", True
 
             return "", False
+        
