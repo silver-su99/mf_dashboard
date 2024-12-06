@@ -128,9 +128,9 @@ class Predictions(Resource):
 
             file_name = ""
             if model_state == 1: 
-                file_name = 'xgb_down_1206.pkl'
+                file_name = 'xgb_down_1206_2.pkl'
             elif model_state == 2: 
-                file_name = 'xgb_1206.pkl'
+                file_name = 'xgb_1206_2.pkl'
 
             with open(f'models/{file_name}', 'rb') as model_file:
                 xgb = pickle.load(model_file)
@@ -167,8 +167,7 @@ class Predictions(Resource):
                 # 장르 리스트를 기반으로 원핫인코딩 초기화
                 genre_encoding = pd.DataFrame(0, index=df_merged_final.index, columns=all_genres)
 
-                print("%%%%%%%%%%%%%%%%%%%%")
-                print(genre_encoding)
+
 
                 # 각 곡의 장르 처리
                 for idx, row in df_merged_final.iterrows():
