@@ -9,7 +9,8 @@ prediction_ns = Namespace("Prediction")
 
 X_cols = ["artist_id", 'day',
           'activaeUser', 'activaeUser_camulative_avg', 'activaeUser_diff_camulative_avg',
-        'genre', 'album_type', 'artist_cnt', 
+        'R&B/Soul', '국내드라마', '댄스', '랩/힙합', '록/메탈', '발라드', '인디음악', '포크/블루스', 
+        'album_type', 'artist_cnt', 
           'avg_prior_activae', 'prior_release_count', 'prior_release_gap',
       'birth_year', 'activity_year', 'activity_type', 'gender',
       'agency', 'artist_genre_main', 'year', 'month', 'day2', 'week_of_month',
@@ -30,6 +31,7 @@ class Predictions(Resource):
             ##### 1. 클라이언트가 보낸 데이터 받아오기 
             data = request.get_json()
 
+
             # 데이터 유효성 검증: song_id, activaeUsers, streamings, listeners 데이터 받아와야 함 
             required_fields = ['song_id', "activaeUsers", "model_state"]
             if not all(field in data for field in required_fields):
@@ -38,7 +40,6 @@ class Predictions(Resource):
             song_id = data.get("song_id")
             activaeUsers = data.get("activaeUsers")
             model_state = data.get("model_state")
-
 
 
             ##### 2. DB에서 데이터 불러오기 (song, artist)
@@ -68,7 +69,8 @@ class Predictions(Resource):
             artist_ids = song['artist_id']
 
             artists = artists_collection.find({"artist_id": {"$in": artist_ids}}, {"_id": 0})
-            
+
+
             ##### 3. 데이터 전처리 (입력 데이터에 맞는 계산)
             # song 
             df_song = pd.DataFrame(song)  
@@ -88,8 +90,8 @@ class Predictions(Resource):
                     dic_artist[k].append(v)
 
 
-
             df_artist = pd.DataFrame(dic_artist) 
+
 
             # birth => birth_year
             df_artist = parse_birth_year(df_artist)
@@ -117,7 +119,6 @@ class Predictions(Resource):
             df_record['season'] = df_record['month'].map(parse_season)
 
 
-
             # song + record 
             # df_song_repeat = pd.concat([df_song]*len(df_record), ignore_index=True)
             # df_merged = pd.concat([df_song_repeat, df_record], axis=1)
@@ -127,9 +128,9 @@ class Predictions(Resource):
 
             file_name = ""
             if model_state == 1: 
-                file_name = 'xgb_down_1004.pkl'
+                file_name = 'xgb_down_1206.pkl'
             elif model_state == 2: 
-                file_name = 'xgb_1004.pkl'
+                file_name = 'xgb_1206.pkl'
 
             with open(f'models/{file_name}', 'rb') as model_file:
                 xgb = pickle.load(model_file)
@@ -147,8 +148,7 @@ class Predictions(Resource):
 
                 df_song_repeat = pd.concat([song.to_frame().T]*len(df_record), ignore_index=True)
 
-                print("############")
-                print(df_song_repeat)
+   
 
                 df_merged = pd.concat([df_song_repeat, df_record], axis=1)
                 
@@ -157,9 +157,35 @@ class Predictions(Resource):
                 df_merged_final = pd.concat([df_merged, df_artist_repeat], axis=1)
 
                 df_merged_final["release_age"] = parse_age(df_merged_final)       
+
+                # 라벨 인코딩 
                 df_merged_final = label_encoding(df_merged_final)
 
+                ##### 원핫인코딩
+                all_genres = ['R&B/Soul', '국내드라마', '댄스', '랩/힙합', '록/메탈', '발라드', '인디음악', '포크/블루스']
+
+                # 장르 리스트를 기반으로 원핫인코딩 초기화
+                genre_encoding = pd.DataFrame(0, index=df_merged_final.index, columns=all_genres)
+
+                print("%%%%%%%%%%%%%%%%%%%%")
+                print(genre_encoding)
+
+                # 각 곡의 장르 처리
+                for idx, row in df_merged_final.iterrows():
+                    genres = row['genre'].split(', ')  # 콤마로 분리하여 리스트로 변환
+                    for genre in genres:
+                        if genre in genre_encoding.columns:
+                            genre_encoding.loc[idx, genre] = 1
+                print("#############")
+                print(genre_encoding)
+
+                # 결과 병합
+                df_merged_final = pd.concat([df_merged_final, genre_encoding], axis=1)
+
                 df_merged_final = add_column(df_merged_final)
+
+                print("#########")
+                print(df_merged_final)
 
 
                  

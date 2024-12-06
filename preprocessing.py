@@ -187,7 +187,7 @@ def label_encoding(df):
     import joblib
     # import sklearn
     # from sklearn.preprocessing import LabelEncoder
-    label_encoders = joblib.load('models/label_encoder_1003.pkl')
+    label_encoders = joblib.load('models/label_encoder_1206.pkl')
     # import pickle
 
 

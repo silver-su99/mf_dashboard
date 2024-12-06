@@ -6,7 +6,7 @@ load_dotenv()
 # ========== db ==========
 
 def get_db(db_name):
-    connection_string = f"mongodb+srv://{os.getenv('DB_USER')}:{os.getenv('DB_PWD')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
+    connection_string = f"mongodb+srv://{os.getenv('DB_USER')}:{os.getenv('DB_PWD')}@{os.getenv('DB_HOST')}/?retryWrites=true&w=majority&tlsAllowInvalidCertificates=true"
     client = MongoClient(connection_string) # MongoClient 객체 생성
 
     db = client[db_name]
@@ -20,4 +20,4 @@ if os.getenv("FLASK_ENV") == 'development':
 else: 
   uri = os.getenv('URI_DEPOLYMENT')
 
-print(uri)
+print(os.getenv("FLASK_ENV"))
