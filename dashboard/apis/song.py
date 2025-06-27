@@ -90,13 +90,13 @@ class Songs(Resource):
                 dic_col2lst["prior_release_gap"].append(prev_release)
             
             if dic_col2lst["prior_release_count"] == 0: 
-                dic_col2lst_total['prior_activae'] = 0
+                dic_col2lst_total['prior_activae'].append(0)
             else:
                 dic_col2lst_total['prior_activae'].append(sum( dic_col2lst["prior_activae"])/dic_col2lst["prior_release_count"] )
             dic_col2lst_total['prior_release_count'].append(dic_col2lst["prior_release_count"])
 
             if len(dic_col2lst["prior_release_gap"]) == 0:
-                dic_col2lst_total["prior_release_gap"] = 0
+                dic_col2lst_total["prior_release_gap"].append(0)
             else: 
                 recent = max(dic_col2lst["prior_release_gap"])
                 # 문자열을 datetime 객체로 변환

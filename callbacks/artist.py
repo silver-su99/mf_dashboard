@@ -179,13 +179,29 @@ def callback_artist(dash_app1):
     )
     def toggle_modal_artist_info(*args):
 
-        def get_value(d, key, default='N/A'):
-            value = d.get(key, default)
-            # 확인: value가 nan인지 확인
-            if isinstance(value, float) and math.isnan(value):
-                return default
-            return value
+        # def get_value(d, key, default='N/A'):
+        #     value = d.get(key, default)
+        #     # 확인: value가 nan인지 확인
+        #     print(f"##############{key}###################")
+        #     print()
+        #     if isinstance(value, float) and math.isnan(value):
+        #         return default
+        #     return value
         
+        def get_value(d, key, default='NONE'):
+            import numpy as np
+            value = d.get(key)
+
+            # None, "null", "", np.nan, float('nan') 모두 처리
+            if value is None:
+                return default
+            if isinstance(value, str) and value.strip().lower() in ["", "null"]:
+                return default
+            if isinstance(value, (float, np.float64)) and math.isnan(value):
+                return default
+
+            return str(value)
+
         ctx = callback_context  # 현재의 콜백 컨텍스트를 가져옵니다.
         triggered = ctx.triggered[0] if ctx.triggered else None
 
@@ -219,8 +235,8 @@ def callback_artist(dash_app1):
                             html.Div(get_value(artist, "activity_year", default='N/A'), className="value-activity"),
                             html.Div(get_value(artist, "activity_type", default='N/A'), className="value-type"),
                             html.Div(get_value(artist, "gender", default='N/A'), className="value-gender"),
-                            html.Div(get_value(artist, "genre", default='N/A'), className="value-agency"),
-                            html.Div(get_value(artist, "agency", default='N/A'), className="value-genre"),
+                            html.Div(get_value(artist, "artist_genre_main", default='N/A'), className="value-genre"),
+                            html.Div(get_value(artist, "agency", default='N/A'), className="value-agency"),
                     ]) 
                 ]
                 

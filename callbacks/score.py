@@ -280,10 +280,12 @@ def callback_score(dash_app1):
             try:
                 url = f"{uri}/predictions"  # Flask API의 POST 엔드포인트
                 response = requests.post(url, json=data)
-
+                response_data = response.json()  # JSON 데이터 파싱
+                print(f"####################response_data####################")
+                print(response_data)
 
                 if response.status_code in (201, 200):
-                    response_data = response.json()  # JSON 데이터 파싱
+                    
                     preds_activae = list(response_data['pred_by_artist'].values())
 
                     table_dict = response_data['table_data'][0]

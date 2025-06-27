@@ -45,6 +45,8 @@ class Predictions(Resource):
             ##### 2. DB에서 데이터 불러오기 (song, artist)
             # song 
             song = songs_collection.find_one({"song_id": int(song_id)}, {"_id": 0})
+            print("###################song###############")
+            print(song)
             
             # 리스트의 길이에 맞춰 데이터프레임 생성
             max_length = max(len(song['artist_id']), len(song['avg_prior_activae']), len(song['prior_release_count']), len(song['prior_release_gap']))
